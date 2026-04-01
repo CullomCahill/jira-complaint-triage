@@ -14,3 +14,7 @@ export async function hasApiKey() {
   const key = await kvs.getSecret(API_KEY_SECRET);
   return key != null && key.length > 0;
 }
+
+export async function deleteApiKey() {
+  await kvs.deleteSecret(API_KEY_SECRET);
+}

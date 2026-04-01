@@ -17,6 +17,10 @@ permissions:
   scopes:
     - read:jira-work
     - storage:app
+  external:
+    fetch:
+      backend:
+        - 'https://api.anthropic.com'
 app:
   runtime:
     name: nodejs24.x

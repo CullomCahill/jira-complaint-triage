@@ -10,14 +10,13 @@ AI-powered bug triage pipeline for regulated SaMD environments, built on Atlassi
 
 ### Standard deploy (after editing backend or frontend)
 
+From the project root:
+
 ```powershell
-cd static/hello-world
-npm run build
-cd ../..
-npx @forge/cli deploy
+npm run deploy
 ```
 
-Then hard-refresh the Jira issue page: **Ctrl+Shift+R**
+This builds the frontend and deploys in one command. Then hard-refresh the Jira issue page: **Ctrl+Shift+R**
 
 ### First time / after adding new scopes or permissions
 

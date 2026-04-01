@@ -1,6 +1,7 @@
 import Resolver from '@forge/resolver';
 import api, { route } from '@forge/api';
-import { saveApiKey, hasApiKey } from './storage.js';
+import { saveApiKey, hasApiKey, deleteApiKey, getApiKey } from './storage.js';
+import { callAnthropic } from './pipeline/anthropicClient.js';
 
 const resolver = new Resolver();
 
@@ -29,6 +30,18 @@ resolver.define('saveApiKey', async (req) => {
 resolver.define('getApiKeyStatus', async () => {
   const exists = await hasApiKey();
   return { exists };
+});
+
+resolver.define('deleteApiKey', async () => {
+  await deleteApiKey();
+  return { success: true };
+});
+
+resolver.define('testAnthropicCall', async () => {
+  const apiKey = await getApiKey();
+  if (!apiKey) throw new Error('No API key saved.');
+  const response = await callAnthropic('Say "Forge connection successful!" and nothing else.', apiKey);
+  return { response };
 });
 
 export const handler = resolver.getDefinitions();
