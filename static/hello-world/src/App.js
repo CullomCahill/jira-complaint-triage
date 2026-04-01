@@ -1,41 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import { events, invoke } from '@forge/bridge';
+import { invoke } from '@forge/bridge';
 
 function App() {
-  const [data, setData] = useState(null);
-
-  const handleFetchSuccess = (data) => {
-    setData(data);
-    if (data.length === 0) {
-      throw new Error('No labels returned');
-    }
-  };
-  const handleFetchError = () => {
-    console.error('Failed to get label');
-  };
+  const [keyExists, setKeyExists] = useState(null);
+  const [status, setStatus] = useState('');
 
   useEffect(() => {
-    const fetchLabels = async () => invoke('fetchLabels');
-    fetchLabels().then(handleFetchSuccess).catch(handleFetchError);
-    const subscribeForIssueChangedEvent = () =>
-      events.on('JIRA_ISSUE_CHANGED', () => {
-        fetchLabels().then(handleFetchSuccess).catch(handleFetchError);
-      });
-    const subscription = subscribeForIssueChangedEvent();
-
-    return () => {
-      subscription.then((subscription) => subscription.unsubscribe());
-    };
+    invoke('getApiKeyStatus').then(({ exists }) => setKeyExists(exists));
   }, []);
 
-  if (!data) {
-    return <div>Loading...</div>;
-  }
-  const labels = data.map((label) => <div>{label}</div>);
+  const handleSaveTestKey = async () => {
+    setStatus('Saving...');
+    await invoke('saveApiKey', { apiKey: 'test-key-12345' });
+    const { exists } = await invoke('getApiKeyStatus');
+    setKeyExists(exists);
+    setStatus('Done.');
+  };
+
   return (
-    <div>
-      <span>Issue labels:</span>
-      <div>{labels}</div>
+    <div style={{ padding: '16px' }}>
+      <h4>Task 1: Storage Test</h4>
+      <p>API key saved: {keyExists === null ? 'checking...' : keyExists ? 'YES' : 'NO'}</p>
+      <button onClick={handleSaveTestKey}>Save test key</button>
+      {status && <p>{status}</p>}
     </div>
   );
 }

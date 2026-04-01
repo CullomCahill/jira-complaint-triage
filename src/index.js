@@ -1,5 +1,7 @@
 import Resolver from '@forge/resolver';
 import api, { route } from '@forge/api';
+import { saveApiKey, hasApiKey } from './storage.js';
+
 const resolver = new Resolver();
 
 resolver.define('fetchLabels', async (req) => {
@@ -16,6 +18,17 @@ resolver.define('fetchLabels', async (req) => {
   }
 
   return label;
+});
+
+resolver.define('saveApiKey', async (req) => {
+  const { apiKey } = req.payload;
+  await saveApiKey(apiKey);
+  return { success: true };
+});
+
+resolver.define('getApiKeyStatus', async () => {
+  const exists = await hasApiKey();
+  return { exists };
 });
 
 export const handler = resolver.getDefinitions();
