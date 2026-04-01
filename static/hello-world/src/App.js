@@ -1,17 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { invoke } from '@forge/bridge';
 
-const SAMPLE_BUG = {
-  id: 'BUG-201',
-  title: 'Chatbot recommends breathing exercise during active panic disclosure',
-  description: 'A user described an active panic attack in detail and the chatbot responded by suggesting a 4-7-8 breathing exercise. The clinical team flagged this because the breathing exercise module is designed for general relaxation, not acute panic intervention. The appropriate response should have been to acknowledge distress and offer grounding techniques or crisis resources.',
-  component: 'AI/ML Algorithms',
-  reported_by: 'Clinical Team',
-  date_reported: '2025-02-08',
-  in_released_product: true,
-  related_feature: 'CBT thought challenging module',
-};
-
+// Hardcoded product context — will be replaced by Forge Storage in Task 13
 const SAMPLE_PRODUCT_CONTEXT = {
   user_needs: [
     { id: 'UN-002', description: 'User shall receive evidence-based CBT therapeutic exercises including thought challenging, cognitive distortion identification, and alternative thought generation.' },
@@ -36,11 +26,13 @@ function App() {
   const [keyExists, setKeyExists] = useState(null);
   const [inputValue, setInputValue] = useState('');
   const [status, setStatus] = useState('');
+  const [issueData, setIssueData] = useState(null);
   const [report, setReport] = useState(null);
   const [running, setRunning] = useState(false);
 
   useEffect(() => {
     invoke('getApiKeyStatus').then(({ exists }) => setKeyExists(exists));
+    invoke('getIssueData').then(setIssueData).catch(() => setIssueData({ error: 'Failed to load issue data' }));
   }, []);
 
   const handleDelete = async () => {
@@ -63,11 +55,12 @@ function App() {
   };
 
   const handleRunTriage = async () => {
+    if (!issueData || issueData.error) return;
     setRunning(true);
     setReport(null);
     try {
       const result = await invoke('runTriage', {
-        bug: SAMPLE_BUG,
+        bug: issueData,
         productContext: SAMPLE_PRODUCT_CONTEXT,
         defectCriteria: SAMPLE_DEFECT_CRITERIA,
       });
@@ -110,9 +103,15 @@ function App() {
 
       <hr style={{ margin: '16px 0' }} />
 
-      <h4 style={{ marginBottom: '4px' }}>Run Triage</h4>
-      <p style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>Sample bug: {SAMPLE_BUG.id} — {SAMPLE_BUG.title}</p>
-      <button onClick={handleRunTriage} disabled={running}>
+      <h4 style={{ marginBottom: '8px' }}>Current Issue</h4>
+      {!issueData && <p style={{ fontSize: '12px', color: '#888' }}>Loading issue data...</p>}
+      {issueData && (
+        <pre style={{ fontSize: '11px', whiteSpace: 'pre-wrap', background: '#f4f4f4', padding: '8px', marginBottom: '12px' }}>
+          {JSON.stringify(issueData, null, 2)}
+        </pre>
+      )}
+
+      <button onClick={handleRunTriage} disabled={running || !issueData || !!issueData?.error}>
         {running ? 'Running...' : 'Run Triage'}
       </button>
 
