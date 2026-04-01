@@ -9,6 +9,7 @@ function App() {
   const [classifyResult, setClassifyResult] = useState(null);
   const [probabilityResult, setProbabilityResult] = useState(null);
   const [severityResult, setSeverityResult] = useState(null);
+  const [riskReport, setRiskReport] = useState(null);
 
   useEffect(() => {
     invoke('getApiKeyStatus').then(({ exists }) => setKeyExists(exists));
@@ -124,6 +125,23 @@ function App() {
       {severityResult && (
         <pre style={{ marginTop: '8px', fontSize: '11px', whiteSpace: 'pre-wrap', background: '#f4f4f4', padding: '8px' }}>
           {JSON.stringify(severityResult, null, 2)}
+        </pre>
+      )}
+
+      <hr style={{ margin: '16px 0' }} />
+      <h4 style={{ marginBottom: '8px' }}>Task 7: Risk Scoring</h4>
+      <button onClick={async () => {
+        setRiskReport({ status: 'Running full pipeline...' });
+        try {
+          const result = await invoke('testRiskScoring');
+          setRiskReport(result);
+        } catch (e) {
+          setRiskReport({ error: e.message });
+        }
+      }}>Run Full Triage (BUG-201)</button>
+      {riskReport && (
+        <pre style={{ marginTop: '8px', fontSize: '11px', whiteSpace: 'pre-wrap', background: '#f4f4f4', padding: '8px' }}>
+          {JSON.stringify(riskReport, null, 2)}
         </pre>
       )}
     </div>
