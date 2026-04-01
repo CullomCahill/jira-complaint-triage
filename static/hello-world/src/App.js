@@ -1,15 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { invoke } from '@forge/bridge';
 
+const SAMPLE_BUG = {
+  id: 'BUG-201',
+  title: 'Chatbot recommends breathing exercise during active panic disclosure',
+  description: 'A user described an active panic attack in detail and the chatbot responded by suggesting a 4-7-8 breathing exercise. The clinical team flagged this because the breathing exercise module is designed for general relaxation, not acute panic intervention. The appropriate response should have been to acknowledge distress and offer grounding techniques or crisis resources.',
+  component: 'AI/ML Algorithms',
+  reported_by: 'Clinical Team',
+  date_reported: '2025-02-08',
+  in_released_product: true,
+  related_feature: 'CBT thought challenging module',
+};
+
+const SAMPLE_PRODUCT_CONTEXT = {
+  user_needs: [
+    { id: 'UN-002', description: 'User shall receive evidence-based CBT therapeutic exercises including thought challenging, cognitive distortion identification, and alternative thought generation.' },
+    { id: 'UN-005', description: 'User shall be connected to crisis resources immediately when expressing distress or suicidal ideation.' },
+    { id: 'UN-009', description: 'User shall be able to interact with the chatbot using natural language and receive contextually appropriate therapeutic responses.' },
+  ],
+  product_requirements: [
+    { id: 'PR-003', description: 'The CBT thought challenging module shall guide the user through all required steps in sequence.', traces_to: 'UN-002' },
+    { id: 'PR-005', description: 'The crisis detection algorithm shall identify crisis-related language and initiate the crisis escalation protocol within 2 seconds of detection.', traces_to: 'UN-005' },
+    { id: 'PR-012', description: 'The sentiment analysis model shall accurately classify user emotional state, accounting for common linguistic patterns including sarcasm, minimization, and indirect expression of distress.', traces_to: 'UN-009' },
+  ],
+};
+
+const SAMPLE_DEFECT_CRITERIA = {
+  must_meet_both: [
+    'It is included in the released product (not deprecated or unreleased features)',
+    'It is a deviation from the intended function of the core product (fails a User Need or Product Requirement)',
+  ],
+};
+
 function App() {
   const [keyExists, setKeyExists] = useState(null);
   const [inputValue, setInputValue] = useState('');
   const [status, setStatus] = useState('');
-  const [testResult, setTestResult] = useState('');
-  const [classifyResult, setClassifyResult] = useState(null);
-  const [probabilityResult, setProbabilityResult] = useState(null);
-  const [severityResult, setSeverityResult] = useState(null);
-  const [riskReport, setRiskReport] = useState(null);
+  const [report, setReport] = useState(null);
+  const [running, setRunning] = useState(false);
 
   useEffect(() => {
     invoke('getApiKeyStatus').then(({ exists }) => setKeyExists(exists));
@@ -32,6 +60,23 @@ function App() {
     setInputValue('');
     setKeyExists(true);
     setStatus('API key saved.');
+  };
+
+  const handleRunTriage = async () => {
+    setRunning(true);
+    setReport(null);
+    try {
+      const result = await invoke('runTriage', {
+        bug: SAMPLE_BUG,
+        productContext: SAMPLE_PRODUCT_CONTEXT,
+        defectCriteria: SAMPLE_DEFECT_CRITERIA,
+      });
+      setReport(result);
+    } catch (e) {
+      setReport({ error: e.message });
+    } finally {
+      setRunning(false);
+    }
   };
 
   return (
@@ -61,87 +106,19 @@ function App() {
         style={{ width: '100%', padding: '6px', marginBottom: '8px', boxSizing: 'border-box' }}
       />
       <button onClick={handleSave}>Save API Key</button>
-
       {status && <p style={{ marginTop: '8px', fontSize: '13px' }}>{status}</p>}
 
       <hr style={{ margin: '16px 0' }} />
-      <h4 style={{ marginBottom: '8px' }}>Task 3: API Test</h4>
-      <button onClick={async () => {
-        setTestResult('Calling Anthropic...');
-        try {
-          const { response } = await invoke('testAnthropicCall');
-          setTestResult(response);
-        } catch (e) {
-          setTestResult(`Error: ${e.message}`);
-        }
-      }}>Test Anthropic Call</button>
-      {testResult && <p style={{ marginTop: '8px', fontSize: '13px' }}>{testResult}</p>}
 
-      <hr style={{ margin: '16px 0' }} />
-      <h4 style={{ marginBottom: '8px' }}>Task 4: Defect Classification</h4>
-      <button onClick={async () => {
-        setClassifyResult({ status: 'Running classification...' });
-        try {
-          const result = await invoke('testDefectClassification');
-          setClassifyResult(result);
-        } catch (e) {
-          setClassifyResult({ error: e.message });
-        }
-      }}>Run Defect Classification (BUG-201)</button>
-      {classifyResult && (
-        <pre style={{ marginTop: '8px', fontSize: '11px', whiteSpace: 'pre-wrap', background: '#f4f4f4', padding: '8px' }}>
-          {JSON.stringify(classifyResult, null, 2)}
-        </pre>
-      )}
+      <h4 style={{ marginBottom: '4px' }}>Run Triage</h4>
+      <p style={{ fontSize: '12px', color: '#666', marginBottom: '8px' }}>Sample bug: {SAMPLE_BUG.id} — {SAMPLE_BUG.title}</p>
+      <button onClick={handleRunTriage} disabled={running}>
+        {running ? 'Running...' : 'Run Triage'}
+      </button>
 
-      <hr style={{ margin: '16px 0' }} />
-      <h4 style={{ marginBottom: '8px' }}>Task 5: Probability Assessment</h4>
-      <button onClick={async () => {
-        setProbabilityResult({ status: 'Running steps 1 + 2...' });
-        try {
-          const result = await invoke('testProbabilityAssessment');
-          setProbabilityResult(result);
-        } catch (e) {
-          setProbabilityResult({ error: e.message });
-        }
-      }}>Run Probability Assessment (BUG-201)</button>
-      {probabilityResult && (
-        <pre style={{ marginTop: '8px', fontSize: '11px', whiteSpace: 'pre-wrap', background: '#f4f4f4', padding: '8px' }}>
-          {JSON.stringify(probabilityResult, null, 2)}
-        </pre>
-      )}
-
-      <hr style={{ margin: '16px 0' }} />
-      <h4 style={{ marginBottom: '8px' }}>Task 6: Severity Assessment</h4>
-      <button onClick={async () => {
-        setSeverityResult({ status: 'Running steps 1 + 2 + 3...' });
-        try {
-          const result = await invoke('testSeverityAssessment');
-          setSeverityResult(result);
-        } catch (e) {
-          setSeverityResult({ error: e.message });
-        }
-      }}>Run Severity Assessment (BUG-201)</button>
-      {severityResult && (
-        <pre style={{ marginTop: '8px', fontSize: '11px', whiteSpace: 'pre-wrap', background: '#f4f4f4', padding: '8px' }}>
-          {JSON.stringify(severityResult, null, 2)}
-        </pre>
-      )}
-
-      <hr style={{ margin: '16px 0' }} />
-      <h4 style={{ marginBottom: '8px' }}>Task 7: Risk Scoring</h4>
-      <button onClick={async () => {
-        setRiskReport({ status: 'Running full pipeline...' });
-        try {
-          const result = await invoke('testRiskScoring');
-          setRiskReport(result);
-        } catch (e) {
-          setRiskReport({ error: e.message });
-        }
-      }}>Run Full Triage (BUG-201)</button>
-      {riskReport && (
-        <pre style={{ marginTop: '8px', fontSize: '11px', whiteSpace: 'pre-wrap', background: '#f4f4f4', padding: '8px' }}>
-          {JSON.stringify(riskReport, null, 2)}
+      {report && (
+        <pre style={{ marginTop: '12px', fontSize: '11px', whiteSpace: 'pre-wrap', background: '#f4f4f4', padding: '8px' }}>
+          {JSON.stringify(report, null, 2)}
         </pre>
       )}
     </div>
