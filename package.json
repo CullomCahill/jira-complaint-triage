@@ -4,12 +4,16 @@
   "main": "index.js",
   "license": "MIT",
   "private": true,
+  "scripts": {
+    "deploy": "npm run build --prefix static/hello-world && npx @forge/cli deploy"
+  },
   "devDependencies": {
     "eslint": "^8.56.0",
     "eslint-plugin-react-hooks": "^4.6.0"
   },
   "dependencies": {
-    "@forge/resolver": "1.7.1",
-    "@forge/api": "7.1.2"
+    "@forge/api": "7.1.2",
+    "@forge/kvs": "^1.6.0",
+    "@forge/resolver": "1.7.1"
   }
 }

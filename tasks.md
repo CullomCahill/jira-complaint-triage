@@ -2,7 +2,6 @@
 
 ## Phase 1: Foundation
 
-spend 30 min learning jira
 
 ### Task 1: Forge Storage for API Key
 Set up Forge Storage helpers to save and retrieve an Anthropic API key using storage.setSecret() and storage.getSecret().  Create src/storage.js with simple get/set functions for the API key.  Wire up a resolver function in src/index.js that the frontend can call to save and retrieve the key.  Test by hardcoding a test key, saving it, and reading it back via the resolver.

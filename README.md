@@ -1,47 +1,61 @@
-# Forge Hello World
+# Jira Complaint Triage — Forge App
 
-This project contains a Forge app written in Javascript that displays `Hello World!` in a Jira issue panel. 
+AI-powered bug triage pipeline for regulated SaMD environments, built on Atlassian Forge.
 
-See [developer.atlassian.com/platform/forge/](https://developer.atlassian.com/platform/forge) for documentation and tutorials explaining Forge.
+---
 
-## Requirements
+## Dev Workflow (Windows / PowerShell)
 
-See [Set up Forge](https://developer.atlassian.com/platform/forge/set-up-forge/) for instructions to get set up.
+`forge` is not globally aliased, so use `npx @forge/cli` for all forge commands.
 
-## Quick start
+### Standard deploy (after editing backend or frontend)
 
-- Install top-level dependencies:
-```
-npm install
-```
+From the project root:
 
-- Install dependencies inside of the `static/hello-world` directory:
-```
-npm install
+```powershell
+npm run deploy
 ```
 
-- Modify your app by editing the files in `static/hello-world/src/`.
+This builds the frontend and deploys in one command. Then hard-refresh the Jira issue page: **Ctrl+Shift+R**
 
-- Build your app (inside of the `static/hello-world` directory):
-```
-npm run build
-```
+### First time / after adding new scopes or permissions
 
-- Deploy your app by running:
-```
-forge deploy
+Run this once after deploying, then redeploy:
+
+```powershell
+npx @forge/cli install --upgrade
 ```
 
-- Install your app in an Atlassian site by running:
-```
-forge install
+### Install on a new Jira site
+
+```powershell
+npx @forge/cli install
 ```
 
-### Notes
-- Use the `forge deploy` command when you want to persist code changes.
-- Use the `forge install` command when you want to install the app on a new site.
-- Once the app is installed on a site, the site picks up the new app changes you deploy without needing to rerun the install command.
+### Lint check only (no deploy)
+
+```powershell
+npx @forge/cli lint
+```
+
+---
+
+## Project Structure
+
+```
+src/
+  index.js          — Forge resolver functions (backend entry point)
+  storage.js        — Forge KVS helpers for secrets and config
+  pipeline/         — LLM triage steps (no Forge dependencies)
+static/hello-world/ — Custom UI React app
+  src/
+    App.js
+reference/          — Original Python pipeline (for reference only)
+manifest.yml        — App config, modules, permissions
+```
+
+---
 
 ## Support
 
-See [Get help](https://developer.atlassian.com/platform/forge/get-help/) for how to get help and provide feedback.
+See [Forge docs](https://developer.atlassian.com/platform/forge) or [Get help](https://developer.atlassian.com/platform/forge/get-help/).
