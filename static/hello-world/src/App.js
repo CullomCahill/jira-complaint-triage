@@ -6,6 +6,7 @@ function App() {
   const [inputValue, setInputValue] = useState('');
   const [status, setStatus] = useState('');
   const [testResult, setTestResult] = useState('');
+  const [classifyResult, setClassifyResult] = useState(null);
 
   useEffect(() => {
     invoke('getApiKeyStatus').then(({ exists }) => setKeyExists(exists));
@@ -72,6 +73,23 @@ function App() {
         }
       }}>Test Anthropic Call</button>
       {testResult && <p style={{ marginTop: '8px', fontSize: '13px' }}>{testResult}</p>}
+
+      <hr style={{ margin: '16px 0' }} />
+      <h4 style={{ marginBottom: '8px' }}>Task 4: Defect Classification</h4>
+      <button onClick={async () => {
+        setClassifyResult({ status: 'Running classification...' });
+        try {
+          const result = await invoke('testDefectClassification');
+          setClassifyResult(result);
+        } catch (e) {
+          setClassifyResult({ error: e.message });
+        }
+      }}>Run Defect Classification (BUG-201)</button>
+      {classifyResult && (
+        <pre style={{ marginTop: '8px', fontSize: '11px', whiteSpace: 'pre-wrap', background: '#f4f4f4', padding: '8px' }}>
+          {JSON.stringify(classifyResult, null, 2)}
+        </pre>
+      )}
     </div>
   );
 }
