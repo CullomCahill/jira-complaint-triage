@@ -7,6 +7,7 @@ function App() {
   const [status, setStatus] = useState('');
   const [testResult, setTestResult] = useState('');
   const [classifyResult, setClassifyResult] = useState(null);
+  const [probabilityResult, setProbabilityResult] = useState(null);
 
   useEffect(() => {
     invoke('getApiKeyStatus').then(({ exists }) => setKeyExists(exists));
@@ -88,6 +89,23 @@ function App() {
       {classifyResult && (
         <pre style={{ marginTop: '8px', fontSize: '11px', whiteSpace: 'pre-wrap', background: '#f4f4f4', padding: '8px' }}>
           {JSON.stringify(classifyResult, null, 2)}
+        </pre>
+      )}
+
+      <hr style={{ margin: '16px 0' }} />
+      <h4 style={{ marginBottom: '8px' }}>Task 5: Probability Assessment</h4>
+      <button onClick={async () => {
+        setProbabilityResult({ status: 'Running steps 1 + 2...' });
+        try {
+          const result = await invoke('testProbabilityAssessment');
+          setProbabilityResult(result);
+        } catch (e) {
+          setProbabilityResult({ error: e.message });
+        }
+      }}>Run Probability Assessment (BUG-201)</button>
+      {probabilityResult && (
+        <pre style={{ marginTop: '8px', fontSize: '11px', whiteSpace: 'pre-wrap', background: '#f4f4f4', padding: '8px' }}>
+          {JSON.stringify(probabilityResult, null, 2)}
         </pre>
       )}
     </div>

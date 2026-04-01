@@ -3,6 +3,7 @@ import api, { route } from '@forge/api';
 import { saveApiKey, hasApiKey, deleteApiKey, getApiKey } from './storage.js';
 import { callAnthropic } from './pipeline/anthropicClient.js';
 import { classifyDefect } from './pipeline/defectClassification.js';
+import { assessProbability } from './pipeline/probability.js';
 
 const resolver = new Resolver();
 
@@ -82,6 +83,46 @@ resolver.define('testDefectClassification', async () => {
 
   const result = await classifyDefect(sampleBug, productContext, defectCriteria, apiKey);
   return result;
+});
+
+resolver.define('testProbabilityAssessment', async () => {
+  const apiKey = await getApiKey();
+  if (!apiKey) throw new Error('No API key saved.');
+
+  const sampleBug = {
+    id: 'BUG-201',
+    title: 'Chatbot recommends breathing exercise during active panic disclosure',
+    description: 'A user described an active panic attack in detail and the chatbot responded by suggesting a 4-7-8 breathing exercise. The clinical team flagged this because the breathing exercise module is designed for general relaxation, not acute panic intervention. The appropriate response should have been to acknowledge distress and offer grounding techniques or crisis resources.',
+    component: 'AI/ML Algorithms',
+    reported_by: 'Clinical Team',
+    date_reported: '2025-02-08',
+    in_released_product: true,
+    related_feature: 'CBT thought challenging module',
+  };
+
+  const productContext = {
+    user_needs: [
+      { id: 'UN-002', description: 'User shall receive evidence-based CBT therapeutic exercises including thought challenging, cognitive distortion identification, and alternative thought generation.' },
+      { id: 'UN-005', description: 'User shall be connected to crisis resources immediately when expressing distress or suicidal ideation.' },
+      { id: 'UN-009', description: 'User shall be able to interact with the chatbot using natural language and receive contextually appropriate therapeutic responses.' },
+    ],
+    product_requirements: [
+      { id: 'PR-003', description: 'The CBT thought challenging module shall guide the user through all required steps in sequence.', traces_to: 'UN-002' },
+      { id: 'PR-005', description: 'The crisis detection algorithm shall identify crisis-related language and initiate the crisis escalation protocol within 2 seconds of detection.', traces_to: 'UN-005' },
+      { id: 'PR-012', description: 'The sentiment analysis model shall accurately classify user emotional state, accounting for common linguistic patterns including sarcasm, minimization, and indirect expression of distress.', traces_to: 'UN-009' },
+    ],
+  };
+
+  const defectCriteria = {
+    must_meet_both: [
+      'It is included in the released product (not deprecated or unreleased features)',
+      'It is a deviation from the intended function of the core product (fails a User Need or Product Requirement)',
+    ],
+  };
+
+  const defect = await classifyDefect(sampleBug, productContext, defectCriteria, apiKey);
+  const probability = await assessProbability(defect, sampleBug, apiKey);
+  return { defect, probability };
 });
 
 export const handler = resolver.getDefinitions();
