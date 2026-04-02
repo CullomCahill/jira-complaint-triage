@@ -2,26 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { invoke } from '@forge/bridge';
 import SettingsPanel from './components/SettingsPanel.js';
 
-// Hardcoded product context — replaced by Forge Storage in Task 13
-const SAMPLE_PRODUCT_CONTEXT = {
-  user_needs: [
-    { id: 'UN-002', description: 'User shall receive evidence-based CBT therapeutic exercises including thought challenging, cognitive distortion identification, and alternative thought generation.' },
-    { id: 'UN-005', description: 'User shall be connected to crisis resources immediately when expressing distress or suicidal ideation.' },
-    { id: 'UN-009', description: 'User shall be able to interact with the chatbot using natural language and receive contextually appropriate therapeutic responses.' },
-  ],
-  product_requirements: [
-    { id: 'PR-003', description: 'The CBT thought challenging module shall guide the user through all required steps in sequence.', traces_to: 'UN-002' },
-    { id: 'PR-005', description: 'The crisis detection algorithm shall identify crisis-related language and initiate the crisis escalation protocol within 2 seconds of detection.', traces_to: 'UN-005' },
-    { id: 'PR-012', description: 'The sentiment analysis model shall accurately classify user emotional state, accounting for common linguistic patterns including sarcasm, minimization, and indirect expression of distress.', traces_to: 'UN-009' },
-  ],
-};
-
-const SAMPLE_DEFECT_CRITERIA = {
-  must_meet_both: [
-    'It is included in the released product (not deprecated or unreleased features)',
-    'It is a deviation from the intended function of the core product (fails a User Need or Product Requirement)',
-  ],
-};
 
 function TriagePanel({ onSettings }) {
   const [issueData, setIssueData] = useState(null);
@@ -37,11 +17,7 @@ function TriagePanel({ onSettings }) {
     setRunning(true);
     setReport(null);
     try {
-      const result = await invoke('runTriage', {
-        bug: issueData,
-        productContext: SAMPLE_PRODUCT_CONTEXT,
-        defectCriteria: SAMPLE_DEFECT_CRITERIA,
-      });
+      const result = await invoke('runTriage', { bug: issueData });
       setReport(result);
     } catch (e) {
       setReport({ error: e.message });

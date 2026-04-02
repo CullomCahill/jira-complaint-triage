@@ -92,9 +92,24 @@ resolver.define('saveDefectCriteria', async (req) => {
 });
 
 resolver.define('runTriage', async (req) => {
-  const { bug, productContext, defectCriteria } = req.payload;
+  const { bug } = req.payload;
   const apiKey = await getApiKey();
   if (!apiKey) throw new Error('No API key saved. Please configure your Anthropic API key in settings.');
+
+  const { userNeeds, productRequirements, defectCriteria } = await getProductContext();
+
+  if (!userNeeds.length || !productRequirements.length) {
+    throw new Error('Product context not configured. Please add user needs and product requirements in Settings.');
+  }
+  if (!defectCriteria.must_meet_both?.length) {
+    throw new Error('Defect criteria not configured. Please add defect criteria in Settings.');
+  }
+
+  const productContext = {
+    user_needs: userNeeds,
+    product_requirements: productRequirements,
+  };
+
   return await runPipeline(bug, productContext, defectCriteria, apiKey);
 });
 
