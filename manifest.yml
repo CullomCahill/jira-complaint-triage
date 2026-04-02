@@ -4,7 +4,7 @@ modules:
       resource: main
       resolver:
         function: resolver
-      viewportSize: medium
+      viewportSize: xlarge
       title: jira-complaint-triage
       icon: https://developer.atlassian.com/platform/forge/images/issue-panel-icon.svg
   function:
