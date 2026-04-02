@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { invoke } from '@forge/bridge';
 import SettingsPanel from './components/SettingsPanel.js';
-
+import TriageReport from './components/TriageReport.js';
 
 function TriagePanel({ onSettings }) {
   const [issueData, setIssueData] = useState(null);
@@ -33,23 +33,33 @@ function TriagePanel({ onSettings }) {
         <button onClick={onSettings} style={{ fontSize: '12px' }}>Settings</button>
       </div>
 
-      <h4 style={{ marginBottom: '8px', fontSize: '13px' }}>Current Issue</h4>
       {!issueData && <p style={{ fontSize: '12px', color: '#888' }}>Loading issue data...</p>}
-      {issueData && (
-        <pre style={{ fontSize: '11px', whiteSpace: 'pre-wrap', background: '#f4f4f4', padding: '8px', marginBottom: '12px' }}>
-          {JSON.stringify(issueData, null, 2)}
-        </pre>
+
+      {issueData && !issueData.error && (
+        <div style={{ marginBottom: '12px' }}>
+          <p style={{ fontSize: '12px', color: '#6b778c', margin: '0 0 2px' }}>{issueData.id}</p>
+          <p style={{ fontSize: '13px', fontWeight: 600, margin: '0 0 8px', color: '#172b4d' }}>{issueData.title}</p>
+          {issueData.description && (
+            <p style={{ fontSize: '12px', color: '#42526e', margin: 0, lineHeight: '1.5' }}>{issueData.description}</p>
+          )}
+        </div>
+      )}
+
+      {issueData?.error && (
+        <p style={{ fontSize: '12px', color: '#bf2600' }}>{issueData.error}</p>
       )}
 
       <button onClick={handleRunTriage} disabled={running || !issueData || !!issueData?.error}>
-        {running ? 'Running...' : 'Run Triage'}
+        {running ? 'Running triage...' : 'Run Triage'}
       </button>
 
-      {report && (
-        <pre style={{ marginTop: '12px', fontSize: '11px', whiteSpace: 'pre-wrap', background: '#f4f4f4', padding: '8px' }}>
-          {JSON.stringify(report, null, 2)}
-        </pre>
+      {running && (
+        <div style={{ marginTop: '12px', fontSize: '12px', color: '#6b778c', fontStyle: 'italic' }}>
+          Running triage pipeline — steps 2 and 3 run in parallel. Usually takes 10–20 seconds...
+        </div>
       )}
+
+      {report && <TriageReport report={report} />}
     </div>
   );
 }
