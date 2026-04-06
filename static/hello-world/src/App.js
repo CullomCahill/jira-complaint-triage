@@ -29,7 +29,7 @@ function TriagePanel({ onSettings }) {
   return (
     <div style={{ padding: '16px', fontFamily: 'sans-serif' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <h4 style={{ margin: 0 }}>Complaint Triage</h4>
+        <h4 style={{ margin: 0 }}>Complaint Risk Assessment</h4>
         <button onClick={onSettings} style={{ fontSize: '12px' }}>Settings</button>
       </div>
 
@@ -50,12 +50,12 @@ function TriagePanel({ onSettings }) {
       )}
 
       <button onClick={handleRunTriage} disabled={running || !issueData || !!issueData?.error}>
-        {running ? 'Running triage...' : 'Run Triage'}
+        {running ? 'Running risk assessment...' : 'Run Risk Assessment'}
       </button>
 
       {running && (
         <div style={{ marginTop: '12px', fontSize: '12px', color: '#6b778c', fontStyle: 'italic' }}>
-          Running triage pipeline — steps 2 and 3 run in parallel. Usually takes 10–20 seconds...
+          Running risk assessment pipeline — steps 2 and 3 run in parallel. Usually takes 10–20 seconds...
         </div>
       )}
 

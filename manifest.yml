@@ -5,7 +5,7 @@ modules:
       resolver:
         function: resolver
       viewportSize: xlarge
-      title: jira-complaint-triage
+      title: Complaint Risk Assessment
       icon: https://developer.atlassian.com/platform/forge/images/issue-panel-icon.svg
   function:
     - key: resolver
