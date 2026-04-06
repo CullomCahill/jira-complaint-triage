@@ -7,6 +7,7 @@ import {
   saveDefectCriteria, getDefectCriteria,
   getProductContext,
   savePostCommentSetting, getPostCommentSetting,
+  saveProductInfo, getProductInfo,
 } from './storage.js';
 import { runPipeline } from './pipeline/runPipeline.js';
 
@@ -173,6 +174,15 @@ resolver.define('saveDefectCriteria', async (req) => {
   return { success: true };
 });
 
+resolver.define('getProductInfo', async () => {
+  return await getProductInfo();
+});
+
+resolver.define('saveProductInfo', async (req) => {
+  await saveProductInfo(req.payload);
+  return { success: true };
+});
+
 resolver.define('getPostCommentSetting', async () => {
   return { enabled: await getPostCommentSetting() };
 });
@@ -202,7 +212,9 @@ resolver.define('runTriage', async (req) => {
     product_requirements: productRequirements,
   };
 
-  const report = await runPipeline(bug, productContext, defectCriteria, apiKey);
+  const productInfo = await getProductInfo();
+
+  const report = await runPipeline(bug, productContext, defectCriteria, apiKey, productInfo);
 
   const postCommentEnabled = await getPostCommentSetting();
   if (postCommentEnabled) {

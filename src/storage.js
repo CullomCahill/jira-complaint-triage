@@ -51,6 +51,18 @@ export async function getDefectCriteria() {
   return await kvs.get(KEYS.defectCriteria) ?? { must_meet_both: [] };
 }
 
+export async function saveProductInfo(productInfo) {
+  await kvs.set('product-info', productInfo);
+}
+
+export async function getProductInfo() {
+  return await kvs.get('product-info') ?? {
+    name: 'MindBridge',
+    type: 'regulated mental health Software as Medical Device (SaMD)',
+    description: 'a CBT-based therapeutic chatbot',
+  };
+}
+
 export async function savePostCommentSetting(enabled) {
   await kvs.set('setting-post-comment', enabled);
 }

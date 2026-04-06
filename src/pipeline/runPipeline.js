@@ -12,9 +12,9 @@ import { calculateRisk } from './riskScoring.js';
  * @param {string} apiKey
  * @returns {object} Final triage report, or non-defect result if Step 1 rules it out
  */
-export async function runPipeline(bug, productContext, defectCriteria, apiKey) {
+export async function runPipeline(bug, productContext, defectCriteria, apiKey, productInfo) {
   // Step 1: Defect classification
-  const defect = await classifyDefect(bug, productContext, defectCriteria, apiKey);
+  const defect = await classifyDefect(bug, productContext, defectCriteria, apiKey, productInfo);
 
   // If not a defect, skip remaining steps
   if (!defect.is_defect) {
@@ -32,8 +32,8 @@ export async function runPipeline(bug, productContext, defectCriteria, apiKey) {
 
   // Steps 2 + 3: Run in parallel since they are independent
   const [probability, severity] = await Promise.all([
-    assessProbability(defect, bug, apiKey),
-    assessSeverity(defect, bug, apiKey),
+    assessProbability(defect, bug, apiKey, productInfo),
+    assessSeverity(defect, bug, apiKey, productInfo),
   ]);
 
   // Step 4: Risk scoring (no LLM)

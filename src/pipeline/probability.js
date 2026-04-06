@@ -8,8 +8,8 @@ import { callAnthropic, parseJsonResponse } from './anthropicClient.js';
  * @param {string} apiKey
  * @returns {object} { bug_id, probability_score, probability_label, rationale }
  */
-export async function assessProbability(defect, bug, apiKey) {
-  const prompt = `You are a Quality Engineer performing a risk probability assessment for a regulated mental health Software as Medical Device (SaMD) product called MindBridge, a CBT-based therapeutic chatbot.
+export async function assessProbability(defect, bug, apiKey, productInfo) {
+  const prompt = `You are a Quality Engineer performing a risk probability assessment for a ${productInfo.type} product called ${productInfo.name}, ${productInfo.description}.
 
 Your task is to assess the PROBABILITY that this defect will occur for users of the product.
 
@@ -40,7 +40,7 @@ Reported By: ${bug.reported_by}
 ${bug.comments?.length ? `\nCOMMENTS (${bug.comments.length}):\n${bug.comments.map(c => `[${c.date}] ${c.author}: ${c.body}`).join('\n\n')}` : ''}
 
 INSTRUCTIONS:
-Assess the probability that a user of the MindBridge product will encounter this defect during normal use. Base your assessment on the evidence available in the bug report, considering the factors listed above. Do not speculate beyond what is stated.
+Assess the probability that a user of the ${productInfo.name} product will encounter this defect during normal use. Base your assessment on the evidence available in the bug report, considering the factors listed above. Do not speculate beyond what is stated.
 
 Respond in the following JSON format only, no other text:
 {

@@ -9,7 +9,7 @@ import { callAnthropic, parseJsonResponse } from './anthropicClient.js';
  * @param {string} apiKey
  * @returns {object} Structured defect classification result
  */
-export async function classifyDefect(bug, productContext, defectCriteria, apiKey) {
+export async function classifyDefect(bug, productContext, defectCriteria, apiKey, productInfo) {
   const cleanBug = {
     id: bug.id,
     title: bug.title,
@@ -22,7 +22,7 @@ export async function classifyDefect(bug, productContext, defectCriteria, apiKey
     comments: bug.comments || [],
   };
 
-  const prompt = `You are a Quality Engineer performing defect classification for a regulated mental health Software as Medical Device (SaMD) product called MindBridge.
+  const prompt = `You are a Quality Engineer performing defect classification for a ${productInfo.type} product called ${productInfo.name}.
 
 Your task is to determine whether the following bug qualifies as a DEFECT based on the defect criteria provided.
 
