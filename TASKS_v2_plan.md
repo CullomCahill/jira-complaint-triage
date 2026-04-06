@@ -17,9 +17,6 @@ After the pipeline completes and results display in the panel, automatically pos
 ## Task 18: Unsaved Changes Guard in Settings
 Track dirty state per `ConfigSection` in `SettingsPanel.js`. If the user clicks Back with any unsaved changes, show a confirmation prompt before navigating away.
 
-## Task 19: Refresh Hint in Panel
-Add a small informational note near the description in the triage panel — e.g. *"Made changes to this ticket? Refresh the page before running a new assessment."* Prevents user confusion when description edits don't reflect in a re-run.
-
 ---
 
 ## Future Version (Post-Beta)

@@ -54,6 +54,6 @@ Thumbs.db
 .env
 
 # Task 
-TASKS*
+TASKS.md
 TASKS_v2_plan.md
 TASKS_v2_prep.md

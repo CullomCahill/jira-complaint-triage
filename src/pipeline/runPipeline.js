@@ -25,6 +25,7 @@ export async function runPipeline(bug, productContext, defectCriteria, apiKey) {
       criterion_1_rationale: defect.criterion_1_rationale,
       criterion_2_rationale: defect.criterion_2_rationale,
       disposition: 'No further action required. Fix at team discretion.',
+      references: (defect.references || []).map(r => ({ ...r, step: 'Classification' })),
       generated_at: new Date().toISOString(),
     };
   }

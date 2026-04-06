@@ -37,6 +37,7 @@ Title: ${bug.title}
 Description: ${bug.description}
 Component: ${bug.component}
 Reported By: ${bug.reported_by}
+${bug.comments?.length ? `\nCOMMENTS (${bug.comments.length}):\n${bug.comments.map(c => `[${c.date}] ${c.author}: ${c.body}`).join('\n\n')}` : ''}
 
 INSTRUCTIONS:
 Assess the probability that a user of the MindBridge product will encounter this defect during normal use. Base your assessment on the evidence available in the bug report, considering the factors listed above. Do not speculate beyond what is stated.
@@ -46,8 +47,11 @@ Respond in the following JSON format only, no other text:
     "bug_id": "${defect.bug_id}",
     "probability_score": 1 to 5,
     "probability_label": "Remote" or "Low" or "Moderate" or "High" or "Very High",
-    "rationale": "two to three sentence explanation grounded in specific evidence from the bug report"
-}`;
+    "rationale": "two to three sentence explanation grounded in specific evidence from the bug report",
+    "references": [{ "source": "Comment by [author] [date]", "quote": "relevant excerpt that influenced this conclusion" }]
+}
+
+Only include entries in "references" for comments that meaningfully influenced your probability assessment. Use an empty array if no comments were relied upon.`;
 
   const responseText = await callAnthropic(prompt, apiKey);
   return parseJsonResponse(responseText);

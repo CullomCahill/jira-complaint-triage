@@ -40,8 +40,12 @@ resolver.define('deleteApiKey', async () => {
 resolver.define('getIssueData', async (req) => {
   const issueKey = req.context.extension.issue.key;
 
-  const res = await api.asUser().requestJira(route`/rest/api/3/issue/${issueKey}`);
-  const data = await res.json();
+  const [issueRes, commentsRes] = await Promise.all([
+    api.asUser().requestJira(route`/rest/api/3/issue/${issueKey}`),
+    api.asUser().requestJira(route`/rest/api/3/issue/${issueKey}/comment?maxResults=50&orderBy=created`),
+  ]);
+  const data = await issueRes.json();
+  const commentsData = await commentsRes.json();
   const f = data.fields;
 
   // Extract well-known fields with friendly names
@@ -56,6 +60,11 @@ resolver.define('getIssueData', async (req) => {
     priority: f.priority?.name || '',
     components: f.components?.map(c => c.name) || [],
     labels: f.labels || [],
+    comments: (commentsData.comments || []).map(c => ({
+      author: c.author?.displayName || 'Unknown',
+      date: c.created ? c.created.split('T')[0] : '',
+      body: adfToText(c.body),
+    })),
   };
 
   // Append any custom fields that have values, using their raw key

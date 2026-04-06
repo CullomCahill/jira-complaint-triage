@@ -41,6 +41,11 @@ export function calculateRisk(defect, probability, severity) {
       risk_level: riskLevel,
     },
     disposition,
+    references: [
+      ...(defect.references || []).map(r => ({ ...r, step: 'Classification' })),
+      ...(probability.references || []).map(r => ({ ...r, step: 'Probability' })),
+      ...(severity.references || []).map(r => ({ ...r, step: 'Severity' })),
+    ],
     generated_at: new Date().toISOString(),
   };
 }

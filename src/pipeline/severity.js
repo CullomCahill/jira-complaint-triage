@@ -40,6 +40,7 @@ Title: ${bug.title}
 Description: ${bug.description}
 Component: ${bug.component}
 Reported By: ${bug.reported_by}
+${bug.comments?.length ? `\nCOMMENTS (${bug.comments.length}):\n${bug.comments.map(c => `[${c.date}] ${c.author}: ${c.body}`).join('\n\n')}` : ''}
 
 INSTRUCTIONS:
 Assess the severity of harm that could result from this defect. Ground your rationale in the specific impact on users of a mental health therapeutic product. Be realistic and do not inflate severity beyond what is supported by the evidence.
@@ -49,8 +50,11 @@ Respond in the following JSON format only, no other text:
     "bug_id": "${defect.bug_id}",
     "severity_score": 1 to 5,
     "severity_label": "Negligible" or "Minor" or "Moderate" or "Major" or "Critical",
-    "rationale": "two to three sentence explanation focused on the realistic impact to the user"
-}`;
+    "rationale": "two to three sentence explanation focused on the realistic impact to the user",
+    "references": [{ "source": "Comment by [author] [date]", "quote": "relevant excerpt that influenced this conclusion" }]
+}
+
+Only include entries in "references" for comments that meaningfully influenced your severity assessment. Use an empty array if no comments were relied upon.`;
 
   const responseText = await callAnthropic(prompt, apiKey);
   return parseJsonResponse(responseText);

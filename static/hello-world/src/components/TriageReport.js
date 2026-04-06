@@ -17,6 +17,22 @@ function Row({ label, value }) {
   );
 }
 
+function References({ refs }) {
+  if (!refs?.length) return null;
+  return (
+    <div style={{ marginTop: '10px', borderTop: '1px solid #dfe1e6', paddingTop: '10px' }}>
+      <p style={{ fontSize: '11px', fontWeight: 600, color: '#6b778c', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Evidence</p>
+      {refs.map((r, i) => (
+        <div key={i} style={{ marginBottom: '6px' }}>
+          <span style={{ fontSize: '10px', color: '#97a0af', fontWeight: 600, textTransform: 'uppercase', marginRight: '6px' }}>{r.step}</span>
+          <span style={{ fontSize: '11px', color: '#6b778c' }}>{r.source}</span>
+          <p style={{ fontSize: '11px', color: '#42526e', fontStyle: 'italic', margin: '2px 0 0 0', paddingLeft: '8px', borderLeft: '2px solid #dfe1e6' }}>"{r.quote}"</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function TriageReport({ report }) {
   if (report.error) {
     return (
@@ -36,6 +52,7 @@ function TriageReport({ report }) {
         </div>
         <p style={{ fontSize: '12px', color: '#42526e', margin: '0 0 6px' }}>{report.defect_summary}</p>
         <p style={{ fontSize: '11px', color: '#6b778c', margin: 0 }}>{report.disposition}</p>
+        <References refs={report.references} />
       </div>
     );
   }
@@ -64,6 +81,8 @@ function TriageReport({ report }) {
         <Row label="Severity" value={`${ra.severity_score} — ${ra.severity_label}`} />
         <p style={{ fontSize: '11px', color: '#6b778c', margin: '0 0 0 138px', lineHeight: '1.4' }}>{ra.severity_rationale}</p>
       </div>
+
+      <References refs={report.references} />
 
       <p style={{ fontSize: '10px', color: '#97a0af', margin: '10px 0 0' }}>Generated {new Date(report.generated_at).toLocaleString()}</p>
     </div>

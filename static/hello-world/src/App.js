@@ -13,11 +13,13 @@ function TriagePanel({ onSettings }) {
   }, []);
 
   const handleRunTriage = async () => {
-    if (!issueData || issueData.error) return;
     setRunning(true);
     setReport(null);
     try {
-      const result = await invoke('runTriage', { bug: issueData });
+      const freshIssueData = await invoke('getIssueData');
+      setIssueData(freshIssueData);
+      if (freshIssueData.error) throw new Error(freshIssueData.error);
+      const result = await invoke('runTriage', { bug: freshIssueData });
       setReport(result);
     } catch (e) {
       setReport({ error: e.message });
@@ -49,7 +51,7 @@ function TriagePanel({ onSettings }) {
         <p style={{ fontSize: '12px', color: '#bf2600' }}>{issueData.error}</p>
       )}
 
-      <button onClick={handleRunTriage} disabled={running || !issueData || !!issueData?.error}>
+      <button onClick={handleRunTriage} disabled={running}>
         {running ? 'Running risk assessment...' : 'Run Risk Assessment'}
       </button>
 

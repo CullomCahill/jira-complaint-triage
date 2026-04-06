@@ -19,6 +19,7 @@ export async function classifyDefect(bug, productContext, defectCriteria, apiKey
     date_reported: bug.date_reported,
     in_released_product: bug.in_released_product,
     related_feature: bug.related_feature,
+    comments: bug.comments || [],
   };
 
   const prompt = `You are a Quality Engineer performing defect classification for a regulated mental health Software as Medical Device (SaMD) product called MindBridge.
@@ -53,8 +54,11 @@ Respond in the following JSON format only, no other text:
     "criterion_2_failed_requirements": ["PR-XXX", "PR-YYY"] or [],
     "criterion_2_failed_user_needs": ["UN-XXX"] or [],
     "criterion_2_rationale": "one to two sentences explaining which requirements or user needs are failed and why, or why none are failed",
-    "summary": "two to three sentence summary of the overall finding suitable for presentation at a Complaint Review Board meeting"
-}`;
+    "summary": "two to three sentence summary of the overall finding suitable for presentation at a Complaint Review Board meeting",
+    "references": [{ "source": "Comment by [author] [date]", "quote": "relevant excerpt that influenced this conclusion" }]
+}
+
+Only include entries in "references" for comments that meaningfully influenced your conclusion. Use an empty array if no comments were relied upon.`;
 
   const responseText = await callAnthropic(prompt, apiKey);
   return parseJsonResponse(responseText);
