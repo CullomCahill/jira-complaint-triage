@@ -51,6 +51,15 @@ export async function getDefectCriteria() {
   return await kvs.get(KEYS.defectCriteria) ?? { must_meet_both: [] };
 }
 
+export async function savePostCommentSetting(enabled) {
+  await kvs.set('setting-post-comment', enabled);
+}
+
+export async function getPostCommentSetting() {
+  const val = await kvs.get('setting-post-comment');
+  return val ?? true; // default on
+}
+
 export async function getProductContext() {
   const [userNeeds, productRequirements, defectCriteria] = await Promise.all([
     getUserNeeds(),

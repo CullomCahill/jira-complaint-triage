@@ -62,10 +62,18 @@ function SettingsPanel({ onBack }) {
   const [keyExists, setKeyExists] = useState(null);
   const [inputValue, setInputValue] = useState('');
   const [keyStatus, setKeyStatus] = useState('');
+  const [postComment, setPostComment] = useState(true);
 
   useEffect(() => {
     invoke('getApiKeyStatus').then(({ exists }) => setKeyExists(exists));
+    invoke('getPostCommentSetting').then(({ enabled }) => setPostComment(enabled));
   }, []);
+
+  const handlePostCommentToggle = async (e) => {
+    const enabled = e.target.checked;
+    setPostComment(enabled);
+    await invoke('savePostCommentSetting', { enabled });
+  };
 
   const handleSaveKey = async () => {
     if (!inputValue.trim()) { setKeyStatus('Please enter an API key.'); return; }
@@ -90,6 +98,23 @@ function SettingsPanel({ onBack }) {
         </button>
         <h4 style={{ margin: 0 }}>Settings</h4>
       </div>
+
+      <div style={{ marginBottom: '16px' }}>
+        <strong style={{ fontSize: '13px' }}>Behaviour</strong>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px' }}>
+          <input
+            type="checkbox"
+            id="postComment"
+            checked={postComment}
+            onChange={handlePostCommentToggle}
+          />
+          <label htmlFor="postComment" style={{ fontSize: '12px', color: '#172b4d' }}>
+            Auto-post risk assessment as a Jira comment after each run
+          </label>
+        </div>
+      </div>
+
+      <hr style={{ margin: '0 0 16px' }} />
 
       <strong style={{ fontSize: '13px' }}>Anthropic API Key</strong>
       {keyExists === true && (

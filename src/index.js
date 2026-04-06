@@ -6,6 +6,7 @@ import {
   saveProductRequirements, getProductRequirements,
   saveDefectCriteria, getDefectCriteria,
   getProductContext,
+  savePostCommentSetting, getPostCommentSetting,
 } from './storage.js';
 import { runPipeline } from './pipeline/runPipeline.js';
 
@@ -17,6 +18,78 @@ function adfToText(node) {
   if (node.type === 'text') return node.text || '';
   if (node.content) return node.content.map(adfToText).join('');
   return '';
+}
+
+/**
+ * Builds an Atlassian Document Format (ADF) body for the risk assessment comment.
+ */
+function buildCommentAdf(report) {
+  const t = (text, ...marks) => ({
+    type: 'text',
+    text,
+    ...(marks.length ? { marks: marks.map(type => ({ type })) } : {}),
+  });
+  const para = (...content) => ({ type: 'paragraph', content });
+  const rule = () => ({ type: 'rule' });
+  const heading = (level, text) => ({ type: 'heading', attrs: { level }, content: [t(text)] });
+
+  const refsBlock = (refs) => {
+    if (!refs?.length) return [];
+    return [
+      rule(),
+      heading(4, 'Evidence'),
+      {
+        type: 'bulletList',
+        content: refs.map(r => ({
+          type: 'listItem',
+          content: [para(t(`${r.step} \u2014 ${r.source}: `, 'strong'), t(`\u201c${r.quote}\u201d`, 'em'))],
+        })),
+      },
+    ];
+  };
+
+  if (report.classification === 'NON-DEFECT') {
+    return {
+      version: 1, type: 'doc',
+      content: [
+        { type: 'panel', attrs: { panelType: 'note' }, content: [para(t('NON-DEFECT', 'strong'))] },
+        heading(3, `${report.bug_id} \u2014 Complaint Risk Assessment`),
+        para(t(report.defect_summary)),
+        para(t(report.disposition, 'em')),
+        ...refsBlock(report.references),
+        rule(),
+        para(t(`Generated: ${new Date(report.generated_at).toLocaleString()}`, 'em')),
+      ],
+    };
+  }
+
+  const ra = report.risk_assessment;
+  const panelTypeMap = { HIGH: 'error', MEDIUM: 'warning', LOW: 'success' };
+
+  return {
+    version: 1, type: 'doc',
+    content: [
+      {
+        type: 'panel',
+        attrs: { panelType: panelTypeMap[ra.risk_level] || 'info' },
+        content: [para(t(`${ra.risk_level} RISK \u2014 Risk Score: ${ra.risk_score}`, 'strong'))],
+      },
+      heading(3, `${report.bug_id} \u2014 Complaint Risk Assessment`),
+      para(t(report.defect_summary)),
+      rule(),
+      para(t('Disposition: ', 'strong'), t(report.disposition)),
+      para(t('Failed Requirements: ', 'strong'), t(report.failed_requirements.join(', ') || 'None')),
+      para(t('Failed User Needs: ', 'strong'), t(report.failed_user_needs.join(', ') || 'None')),
+      rule(),
+      para(t(`Probability: ${ra.probability_score} \u2014 ${ra.probability_label}`, 'strong')),
+      para(t(ra.probability_rationale)),
+      para(t(`Severity: ${ra.severity_score} \u2014 ${ra.severity_label}`, 'strong')),
+      para(t(ra.severity_rationale)),
+      ...refsBlock(report.references),
+      rule(),
+      para(t(`Generated: ${new Date(report.generated_at).toLocaleString()}`, 'em')),
+    ],
+  };
 }
 
 const resolver = new Resolver();
@@ -100,7 +173,17 @@ resolver.define('saveDefectCriteria', async (req) => {
   return { success: true };
 });
 
+resolver.define('getPostCommentSetting', async () => {
+  return { enabled: await getPostCommentSetting() };
+});
+
+resolver.define('savePostCommentSetting', async (req) => {
+  await savePostCommentSetting(req.payload.enabled);
+  return { success: true };
+});
+
 resolver.define('runTriage', async (req) => {
+  const issueKey = req.context.extension.issue.key;
   const { bug } = req.payload;
   const apiKey = await getApiKey();
   if (!apiKey) throw new Error('No API key saved. Please configure your Anthropic API key in settings.');
@@ -119,7 +202,26 @@ resolver.define('runTriage', async (req) => {
     product_requirements: productRequirements,
   };
 
-  return await runPipeline(bug, productContext, defectCriteria, apiKey);
+  const report = await runPipeline(bug, productContext, defectCriteria, apiKey);
+
+  const postCommentEnabled = await getPostCommentSetting();
+  if (postCommentEnabled) {
+    try {
+      const commentRes = await api.asUser().requestJira(route`/rest/api/3/issue/${issueKey}/comment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ body: buildCommentAdf(report) }),
+      });
+      if (!commentRes.ok) {
+        const errBody = await commentRes.text();
+        console.error('Comment post failed:', commentRes.status, errBody);
+      }
+    } catch (e) {
+      console.error('Failed to post risk assessment comment:', e);
+    }
+  }
+
+  return report;
 });
 
 export const handler = resolver.getDefinitions();
