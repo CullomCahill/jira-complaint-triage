@@ -32,7 +32,15 @@ function TriagePanel({ onSettings }) {
     <div style={{ padding: '16px', fontFamily: 'sans-serif' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
         <h4 style={{ margin: 0 }}>Complaint Risk Assessment</h4>
-        <button onClick={onSettings} style={{ fontSize: '12px' }}>Settings</button>
+        <button onClick={onSettings} style={{
+          fontSize: '12px',
+          padding: '4px 10px',
+          background: 'none',
+          border: '1px solid #dfe1e6',
+          borderRadius: '3px',
+          color: '#42526e',
+          cursor: 'pointer',
+        }}>Settings</button>
       </div>
 
       {!issueData && <p style={{ fontSize: '12px', color: '#888' }}>Loading issue data...</p>}
@@ -51,7 +59,20 @@ function TriagePanel({ onSettings }) {
         <p style={{ fontSize: '12px', color: '#bf2600' }}>{issueData.error}</p>
       )}
 
-      <button onClick={handleRunTriage} disabled={running}>
+      <button
+        onClick={handleRunTriage}
+        disabled={running}
+        style={{
+          padding: '6px 14px',
+          fontSize: '14px',
+          fontWeight: 500,
+          background: running ? '#e3e8f0' : '#0052cc',
+          color: running ? '#a5adba' : '#fff',
+          border: 'none',
+          borderRadius: '3px',
+          cursor: running ? 'not-allowed' : 'pointer',
+        }}
+      >
         {running ? 'Running risk assessment...' : 'Run Risk Assessment'}
       </button>
 
