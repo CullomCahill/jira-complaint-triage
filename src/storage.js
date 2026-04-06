@@ -18,3 +18,44 @@ export async function hasApiKey() {
 export async function deleteApiKey() {
   await kvs.deleteSecret(API_KEY_SECRET);
 }
+
+// Product context — stored as regular (non-secret) KVS entries
+
+const KEYS = {
+  userNeeds: 'product-user-needs',
+  productRequirements: 'product-requirements',
+  defectCriteria: 'product-defect-criteria',
+};
+
+export async function saveUserNeeds(userNeeds) {
+  await kvs.set(KEYS.userNeeds, userNeeds);
+}
+
+export async function getUserNeeds() {
+  return await kvs.get(KEYS.userNeeds) ?? [];
+}
+
+export async function saveProductRequirements(requirements) {
+  await kvs.set(KEYS.productRequirements, requirements);
+}
+
+export async function getProductRequirements() {
+  return await kvs.get(KEYS.productRequirements) ?? [];
+}
+
+export async function saveDefectCriteria(criteria) {
+  await kvs.set(KEYS.defectCriteria, criteria);
+}
+
+export async function getDefectCriteria() {
+  return await kvs.get(KEYS.defectCriteria) ?? { must_meet_both: [] };
+}
+
+export async function getProductContext() {
+  const [userNeeds, productRequirements, defectCriteria] = await Promise.all([
+    getUserNeeds(),
+    getProductRequirements(),
+    getDefectCriteria(),
+  ]);
+  return { userNeeds, productRequirements, defectCriteria };
+}
