@@ -1,11 +1,11 @@
 modules:
   jira:issuePanel:
-    - key: jira-complaint-triage-hello-world-panel
+    - key: complaint-triage-panel
       resource: main
       resolver:
         function: resolver
       viewportSize: xlarge
-      title: Complaint Risk Assessment
+      title: SaMD Complaint Risk Assessment
       icon: https://developer.atlassian.com/platform/forge/images/issue-panel-icon.svg
   function:
     - key: resolver
