@@ -65,6 +65,65 @@ function ConfigSection({ label, hint, storageKey, saveResolver, onDirtyChange })
   );
 }
 
+function DefectCriteriaSection({ onDirtyChange }) {
+  const [criteria, setCriteria] = useState(['', '']);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    invoke('getProductContext').then((ctx) => {
+      const val = ctx['defectCriteria'];
+      if (val?.must_meet_both?.length === 2) {
+        setCriteria(val.must_meet_both);
+        setSaved(true);
+      }
+    });
+  }, []);
+
+  const handleChange = (index, value) => {
+    setCriteria(prev => {
+      const next = [...prev];
+      next[index] = value;
+      return next;
+    });
+    setSaved(false);
+    onDirtyChange('defectCriteria', true);
+  };
+
+  const handleSave = async () => {
+    await invoke('saveDefectCriteria', { defectCriteria: { must_meet_both: criteria } });
+    setSaved(true);
+    onDirtyChange('defectCriteria', false);
+  };
+
+  return (
+    <div style={{ marginBottom: '20px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+        <strong style={{ fontSize: '13px' }}>Defect Criteria</strong>
+        {saved && <span style={{ marginLeft: '8px', color: 'green', fontSize: '12px' }}>&#10003; saved</span>}
+      </div>
+      <p style={{ fontSize: '11px', color: '#666', margin: '0 0 8px' }}>
+        Both conditions must be true for a complaint to be classified as a defect.
+      </p>
+      {[
+        { label: 'Criterion 1', placeholder: 'e.g. It is included in the released product (not deprecated or unreleased features)' },
+        { label: 'Criterion 2', placeholder: 'e.g. It is a deviation from the intended function of the core product' },
+      ].map(({ label, placeholder }, i) => (
+        <div key={i} style={{ marginBottom: '8px' }}>
+          <label style={{ fontSize: '11px', color: '#6b778c', display: 'block', marginBottom: '2px' }}>{label}</label>
+          <textarea
+            style={{ ...textareaStyle, minHeight: '60px' }}
+            value={criteria[i]}
+            placeholder={placeholder}
+            onChange={(e) => handleChange(i, e.target.value)}
+            spellCheck={false}
+          />
+        </div>
+      ))}
+      <button onClick={handleSave}>Save Defect Criteria</button>
+    </div>
+  );
+}
+
 function SettingsPanel({ onBack }) {
   const [keyExists, setKeyExists] = useState(null);
   const [inputValue, setInputValue] = useState('');
@@ -225,13 +284,7 @@ function SettingsPanel({ onBack }) {
         onDirtyChange={handleDirtyChange}
       />
 
-      <ConfigSection
-        label="Defect Criteria"
-        hint='JSON object with a "must_meet_both" array of two strings.'
-        storageKey="defectCriteria"
-        saveResolver="saveDefectCriteria"
-        onDirtyChange={handleDirtyChange}
-      />
+      <DefectCriteriaSection onDirtyChange={handleDirtyChange} />
     </div>
   );
 }
