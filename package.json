@@ -5,7 +5,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "deploy": "npm run build --prefix static/hello-world && npx @forge/cli deploy"
+    "deploy": "npm run build --prefix static/ui && npx @forge/cli deploy"
   },
   "devDependencies": {
     "eslint": "^8.56.0",
