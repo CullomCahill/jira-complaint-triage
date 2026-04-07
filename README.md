@@ -53,6 +53,18 @@ Open any Jira issue on your site. The **"Complaint Risk Assessment"** panel appe
 
 ---
 
+## Running tests
+
+Unit tests cover the core pipeline logic (risk scoring, defect classification, probability, severity). No Jira instance or API key needed.
+
+```bash
+npm test
+```
+
+Tests also run automatically on every push and pull request via GitHub Actions.
+
+---
+
 ## Dev Workflow (after initial setup)
 
 `forge` is not globally aliased, so use `npx @forge/cli` for all forge commands.
