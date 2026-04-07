@@ -27,8 +27,8 @@ export function calculateRisk(defect, probability, severity) {
   return {
     bug_id: defect.bug_id,
     classification: 'DEFECT',
-    failed_requirements: defect.criterion_2_failed_requirements,
-    failed_user_needs: defect.criterion_2_failed_user_needs,
+    failed_requirements: defect.failed_requirements,
+    failed_user_needs: defect.failed_user_needs,
     defect_summary: defect.summary,
     risk_assessment: {
       probability_score: probScore,

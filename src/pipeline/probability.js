@@ -3,8 +3,8 @@ import { callAnthropic, parseJsonResponse } from './anthropicClient.js';
 /**
  * Step 2: Assess the probability that a user encounters this defect.
  *
- * @param {object} defect - Output from classifyDefect (bug_id, summary, criterion_2_failed_requirements)
- * @param {object} bug - Original bug fields: id, title, description, component, reported_by, date_reported, related_feature
+ * @param {object} defect - Output from classifyDefect (bug_id, summary, failed_requirements)
+ * @param {object} bug - Original bug fields: id, title, description, component, reported_by, date_reported
  * @param {string} apiKey
  * @returns {object} { bug_id, probability_score, probability_label, rationale }
  */
@@ -30,7 +30,7 @@ FACTORS TO CONSIDER:
 DEFECT TO ASSESS:
 Bug ID: ${defect.bug_id}
 Classification Summary: ${defect.summary}
-Failed Requirements: ${JSON.stringify(defect.criterion_2_failed_requirements)}
+Failed Requirements: ${JSON.stringify(defect.failed_requirements)}
 
 ORIGINAL BUG DETAILS:
 Title: ${bug.title}

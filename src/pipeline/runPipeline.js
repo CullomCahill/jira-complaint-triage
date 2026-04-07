@@ -6,7 +6,7 @@ import { calculateRisk } from './riskScoring.js';
 /**
  * Runs the full four-step triage pipeline for a single bug.
  *
- * @param {object} bug - Bug fields: id, title, description, component, reported_by, date_reported, in_released_product, related_feature
+ * @param {object} bug - Bug fields: id, title, description, component, reported_by, date_reported
  * @param {object} productContext - { user_needs: [...], product_requirements: [...] }
  * @param {object} defectCriteria - { must_meet_both: [string, string] }
  * @param {string} apiKey
@@ -22,8 +22,7 @@ export async function runPipeline(bug, productContext, defectCriteria, apiKey, p
       bug_id: defect.bug_id,
       classification: 'NON-DEFECT',
       defect_summary: defect.summary,
-      criterion_1_rationale: defect.criterion_1_rationale,
-      criterion_2_rationale: defect.criterion_2_rationale,
+      rationale: defect.rationale,
       disposition: 'No further action required. Fix at team discretion.',
       references: (defect.references || []).map(r => ({ ...r, step: 'Classification' })),
       generated_at: new Date().toISOString(),

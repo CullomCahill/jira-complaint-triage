@@ -66,31 +66,25 @@ function ConfigSection({ label, hint, storageKey, saveResolver, onDirtyChange })
 }
 
 function DefectCriteriaSection({ onDirtyChange }) {
-  const [criteria, setCriteria] = useState(['', '']);
+  const [criterion, setCriterion] = useState('');
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     invoke('getProductContext').then((ctx) => {
       const val = ctx['defectCriteria'];
-      if (val?.must_meet_both?.length === 2) {
-        setCriteria(val.must_meet_both);
-        setSaved(true);
-      }
+      const text = val?.must_meet_both?.[0] ?? '';
+      if (text) { setCriterion(text); setSaved(true); }
     });
   }, []);
 
-  const handleChange = (index, value) => {
-    setCriteria(prev => {
-      const next = [...prev];
-      next[index] = value;
-      return next;
-    });
+  const handleChange = (e) => {
+    setCriterion(e.target.value);
     setSaved(false);
     onDirtyChange('defectCriteria', true);
   };
 
   const handleSave = async () => {
-    await invoke('saveDefectCriteria', { defectCriteria: { must_meet_both: criteria } });
+    await invoke('saveDefectCriteria', { defectCriteria: { must_meet_both: [criterion] } });
     setSaved(true);
     onDirtyChange('defectCriteria', false);
   };
@@ -101,24 +95,19 @@ function DefectCriteriaSection({ onDirtyChange }) {
         <strong style={{ fontSize: '13px' }}>Defect Criteria</strong>
         {saved && <span style={{ marginLeft: '8px', color: 'green', fontSize: '12px' }}>&#10003; saved</span>}
       </div>
-      <p style={{ fontSize: '11px', color: '#666', margin: '0 0 8px' }}>
-        Both conditions must be true for a complaint to be classified as a defect.
+      <p style={{ fontSize: '11px', color: '#666', margin: '0 0 6px' }}>
+        The condition that must be true for a complaint to be classified as a defect.
       </p>
-      {[
-        { label: 'Criterion 1', placeholder: 'e.g. It is included in the released product (not deprecated or unreleased features)' },
-        { label: 'Criterion 2', placeholder: 'e.g. It is a deviation from the intended function of the core product' },
-      ].map(({ label, placeholder }, i) => (
-        <div key={i} style={{ marginBottom: '8px' }}>
-          <label style={{ fontSize: '11px', color: '#6b778c', display: 'block', marginBottom: '2px' }}>{label}</label>
-          <textarea
-            style={{ ...textareaStyle, minHeight: '60px' }}
-            value={criteria[i]}
-            placeholder={placeholder}
-            onChange={(e) => handleChange(i, e.target.value)}
-            spellCheck={false}
-          />
-        </div>
-      ))}
+      <p style={{ fontSize: '11px', color: '#bf8600', background: '#fffae6', border: '1px solid #ffe380', borderRadius: '3px', padding: '5px 8px', margin: '0 0 8px' }}>
+        Note: this tool assumes all issues passed to it are included in the released product. Only run triage on tickets you have already confirmed relate to released features.
+      </p>
+      <textarea
+        style={{ ...textareaStyle, minHeight: '60px' }}
+        value={criterion}
+        placeholder="e.g. It is a deviation from the intended function of the core product (fails a User Need or Product Requirement)"
+        onChange={handleChange}
+        spellCheck={false}
+      />
       <button onClick={handleSave}>Save Defect Criteria</button>
     </div>
   );

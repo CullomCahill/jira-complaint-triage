@@ -4,8 +4,8 @@ import { callAnthropic, parseJsonResponse } from './anthropicClient.js';
  * Step 3: Assess the severity of harm if this defect occurs.
  * Independent from probability — does not use probability output.
  *
- * @param {object} defect - Output from classifyDefect (bug_id, summary, criterion_2_failed_requirements, criterion_2_failed_user_needs)
- * @param {object} bug - Original bug fields: id, title, description, component, reported_by, date_reported, related_feature
+ * @param {object} defect - Output from classifyDefect (bug_id, summary, failed_requirements, failed_user_needs)
+ * @param {object} bug - Original bug fields: id, title, description, component, reported_by, date_reported
  * @param {string} apiKey
  * @returns {object} { bug_id, severity_score, severity_label, rationale }
  */
@@ -32,8 +32,8 @@ FACTORS TO CONSIDER:
 DEFECT TO ASSESS:
 Bug ID: ${defect.bug_id}
 Classification Summary: ${defect.summary}
-Failed Requirements: ${JSON.stringify(defect.criterion_2_failed_requirements)}
-Failed User Needs: ${JSON.stringify(defect.criterion_2_failed_user_needs)}
+Failed Requirements: ${JSON.stringify(defect.failed_requirements)}
+Failed User Needs: ${JSON.stringify(defect.failed_user_needs)}
 
 ORIGINAL BUG DETAILS:
 Title: ${bug.title}
