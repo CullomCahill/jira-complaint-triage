@@ -231,7 +231,7 @@ function TriageReport({ report, userNeeds = [], productRequirements = [] }) {
           borderRadius: '3px',
           letterSpacing: '0.5px',
         }}>
-          {ra.risk_level} RISK — Score: {ra.risk_score}
+          {ra.risk_level} RISK
         </span>
       </div>
 

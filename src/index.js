@@ -7,6 +7,7 @@ import {
   saveAdditionalContext,
   saveProbabilityScale, getProbabilityScale,
   saveSeverityScale, getSeverityScale,
+  saveRiskMatrix, getRiskMatrix,
   getProductContext,
   savePostCommentSetting, getPostCommentSetting,
   saveProductInfo, getProductInfo,
@@ -87,7 +88,7 @@ function buildCommentAdf(report) {
       {
         type: 'panel',
         attrs: { panelType: panelTypeMap[ra.risk_level] || 'info' },
-        content: [para(t(`${ra.risk_level} RISK \u2014 Risk Score: ${ra.risk_score}`, 'strong'))],
+        content: [para(t(`${ra.risk_level} RISK`, 'strong'))],
       },
       heading(3, `${report.bug_id} \u2014 Complaint Risk Assessment`),
       para(t(report.defect_summary)),
@@ -205,6 +206,15 @@ resolver.define('saveSeverityScale', async (req) => {
   return { success: true };
 });
 
+resolver.define('getRiskMatrix', async () => {
+  return await getRiskMatrix();
+});
+
+resolver.define('saveRiskMatrix', async (req) => {
+  await saveRiskMatrix(req.payload.matrix);
+  return { success: true };
+});
+
 
 resolver.define('getProductInfo', async () => {
   return await getProductInfo();
@@ -242,13 +252,14 @@ resolver.define('runTriage', async (req) => {
     additional_context: additionalContext,
   };
 
-  const [productInfo, probabilityScale, severityScale] = await Promise.all([
+  const [productInfo, probabilityScale, severityScale, riskMatrix] = await Promise.all([
     getProductInfo(),
     getProbabilityScale(),
     getSeverityScale(),
+    getRiskMatrix(),
   ]);
 
-  const report = await runPipeline(bug, productContext, apiKey, productInfo, probabilityScale, severityScale);
+  const report = await runPipeline(bug, productContext, apiKey, productInfo, probabilityScale, severityScale, riskMatrix);
 
   const postCommentEnabled = await getPostCommentSetting();
   if (postCommentEnabled) {

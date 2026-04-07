@@ -1,4 +1,5 @@
 import { kvs } from '@forge/kvs';
+import { DEFAULT_RISK_MATRIX } from './pipeline/riskMatrix.js';
 
 const API_KEY_SECRET = 'anthropic-api-key';
 
@@ -94,6 +95,14 @@ export async function saveSeverityScale(scale) {
 
 export async function getSeverityScale() {
   return await kvs.get('severity-scale') ?? DEFAULT_SEVERITY_SCALE;
+}
+
+export async function saveRiskMatrix(matrix) {
+  await kvs.set('risk-matrix', matrix);
+}
+
+export async function getRiskMatrix() {
+  return await kvs.get('risk-matrix') ?? DEFAULT_RISK_MATRIX;
 }
 
 export async function saveAdditionalContext(text) {

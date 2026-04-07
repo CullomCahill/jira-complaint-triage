@@ -82,6 +82,114 @@ const DEFAULT_SEVERITY_SCALE = [
   { label: 'Critical',   description: 'potential for clinical harm or safety event' },
 ];
 
+const RISK_LEVELS = ['LOW', 'MEDIUM', 'HIGH'];
+const RISK_LEVEL_COLORS = {
+  LOW:    { bg: '#e3fcef', border: '#00875a', text: '#006644' },
+  MEDIUM: { bg: '#fffae6', border: '#ff991f', text: '#974f0c' },
+  HIGH:   { bg: '#ffebe6', border: '#de350b', text: '#bf2600' },
+};
+const DEFAULT_RISK_MATRIX = {
+  1: { 1: 'LOW',    2: 'LOW',    3: 'LOW',    4: 'LOW',    5: 'LOW'    },
+  2: { 1: 'LOW',    2: 'LOW',    3: 'MEDIUM', 4: 'MEDIUM', 5: 'HIGH'   },
+  3: { 1: 'LOW',    2: 'MEDIUM', 3: 'MEDIUM', 4: 'HIGH',   5: 'HIGH'   },
+  4: { 1: 'MEDIUM', 2: 'HIGH',   3: 'HIGH',   4: 'HIGH',   5: 'HIGH'   },
+  5: { 1: 'HIGH',   2: 'HIGH',   3: 'HIGH',   4: 'HIGH',   5: 'HIGH'   },
+};
+
+function RiskMatrixEditor({ matrix, probabilityScale, severityScale, onMatrixChange, onDirtyChange, onSave, saved }) {
+  const cycleLevel = (sev, prob) => {
+    const current = matrix?.[sev]?.[prob] ?? matrix?.[String(sev)]?.[String(prob)] ?? DEFAULT_RISK_MATRIX[sev][prob];
+    const idx = RISK_LEVELS.indexOf(current);
+    const next = RISK_LEVELS[(idx + 1) % RISK_LEVELS.length];
+    onMatrixChange({ ...matrix, [sev]: { ...(matrix?.[sev] ?? {}), [prob]: next } });
+    onDirtyChange('riskMatrix', true);
+  };
+
+  const handleReset = () => {
+    onMatrixChange(DEFAULT_RISK_MATRIX);
+    onDirtyChange('riskMatrix', true);
+  };
+
+  const getCell = (sev, prob) =>
+    matrix?.[sev]?.[prob] ?? matrix?.[String(sev)]?.[String(prob)] ?? DEFAULT_RISK_MATRIX[sev][prob];
+
+  const CELL = 52;
+  const probCols = [1, 2, 3, 4, 5];
+  const sevRows  = [5, 4, 3, 2, 1];
+
+  return (
+    <div style={{ marginBottom: '20px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+        <strong style={{ fontSize: '13px' }}>Risk Matrix</strong>
+        {saved && <span style={{ marginLeft: '8px', color: 'green', fontSize: '12px' }}>&#10003; saved</span>}
+      </div>
+      <p style={{ fontSize: '11px', color: '#666', margin: '0 0 8px' }}>
+        Click any cell to cycle its risk level. Rows = Severity (5 top, 1 bottom). Columns = Probability (1 left, 5 right).
+      </p>
+
+      {/* Probability column headers */}
+      <div style={{ display: 'flex', marginLeft: `${CELL + 4}px`, marginBottom: '2px' }}>
+        {probCols.map(p => (
+          <div key={p} style={{ width: `${CELL}px`, textAlign: 'center', fontSize: '10px', color: '#6b778c', fontWeight: 700, lineHeight: '1.2' }}>
+            P{p}
+            {probabilityScale?.[p - 1]?.label && (
+              <div style={{ fontWeight: 400, fontSize: '9px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {probabilityScale[p - 1].label}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Grid rows */}
+      {sevRows.map(sev => (
+        <div key={sev} style={{ display: 'flex', alignItems: 'center', marginBottom: '2px' }}>
+          {/* Severity row label */}
+          <div style={{ width: `${CELL}px`, flexShrink: 0, textAlign: 'right', paddingRight: '4px', fontSize: '10px', color: '#6b778c', fontWeight: 700, lineHeight: '1.2' }}>
+            S{sev}
+            {severityScale?.[sev - 1]?.label && (
+              <div style={{ fontWeight: 400, fontSize: '9px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: `${CELL - 4}px` }}>
+                {severityScale[sev - 1].label}
+              </div>
+            )}
+          </div>
+          {/* Cells */}
+          {probCols.map(prob => {
+            const level = getCell(sev, prob);
+            const c = RISK_LEVEL_COLORS[level] ?? RISK_LEVEL_COLORS.LOW;
+            return (
+              <button
+                key={prob}
+                onClick={() => cycleLevel(sev, prob)}
+                title={`S${sev} × P${prob}: ${level}`}
+                style={{
+                  width: `${CELL}px`, height: `${CELL}px`, marginRight: '2px',
+                  background: c.bg, border: `2px solid ${c.border}`, color: c.text,
+                  fontSize: '9px', fontWeight: 700, cursor: 'pointer',
+                  borderRadius: '2px', padding: '2px', textAlign: 'center',
+                  lineHeight: '1.3', userSelect: 'none',
+                }}
+              >
+                {level}
+              </button>
+            );
+          })}
+        </div>
+      ))}
+
+      <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+        <button onClick={onSave}>Save Risk Matrix</button>
+        <button
+          onClick={handleReset}
+          style={{ color: '#6b778c', background: 'none', border: '1px solid #dfe1e6', borderRadius: '3px', padding: '4px 10px', cursor: 'pointer', fontSize: '12px' }}
+        >
+          Reset to ISO Default
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function ScaleEditor({ label, hint, scaleKey, saveResolver, initialScale, onDirtyChange }) {
   const [scale, setScale] = useState(initialScale);
   const [saved, setSaved] = useState(false);
@@ -157,6 +265,8 @@ function SettingsPanel({ onBack }) {
   const [additionalContextSaved, setAdditionalContextSaved] = useState(false);
   const [probabilityScale, setProbabilityScale] = useState(DEFAULT_PROBABILITY_SCALE);
   const [severityScale, setSeverityScale] = useState(DEFAULT_SEVERITY_SCALE);
+  const [riskMatrix, setRiskMatrix] = useState(DEFAULT_RISK_MATRIX);
+  const [riskMatrixSaved, setRiskMatrixSaved] = useState(false);
 
   const isDirty = Object.values(dirtyMap).some(Boolean) || inputValue.trim().length > 0 || dirtyMap['productInfo'];
 
@@ -171,6 +281,7 @@ function SettingsPanel({ onBack }) {
       if (ps) setProbabilityScale(ps);
       if (ss) setSeverityScale(ss);
     });
+    invoke('getRiskMatrix').then(m => { if (m) setRiskMatrix(m); });
   }, []);
 
   const handleDirtyChange = (key, dirty) => {
@@ -193,6 +304,12 @@ function SettingsPanel({ onBack }) {
     await invoke('saveAdditionalContext', { additionalContext });
     setAdditionalContextSaved(true);
     setDirtyMap(prev => ({ ...prev, additionalContext: false }));
+  };
+
+  const handleSaveRiskMatrix = async () => {
+    await invoke('saveRiskMatrix', { matrix: riskMatrix });
+    setRiskMatrixSaved(true);
+    setDirtyMap(prev => ({ ...prev, riskMatrix: false }));
   };
 
   const handlePostCommentToggle = async (e) => {
@@ -357,6 +474,18 @@ function SettingsPanel({ onBack }) {
         saveResolver="saveSeverityScale"
         initialScale={severityScale}
         onDirtyChange={handleDirtyChange}
+      />
+
+      <hr style={{ margin: '0 0 16px' }} />
+
+      <RiskMatrixEditor
+        matrix={riskMatrix}
+        probabilityScale={probabilityScale}
+        severityScale={severityScale}
+        onMatrixChange={(m) => { setRiskMatrix(m); setRiskMatrixSaved(false); }}
+        onDirtyChange={handleDirtyChange}
+        onSave={handleSaveRiskMatrix}
+        saved={riskMatrixSaved}
       />
     </div>
   );
