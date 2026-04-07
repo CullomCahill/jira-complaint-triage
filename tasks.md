@@ -43,16 +43,29 @@ Add a "Run Triage" button to the issue panel.  When clicked, it reads the issue 
 Extend Forge Storage to save and retrieve product context: user needs, product requirements, defect criteria, and risk matrix definitions.  Create resolver functions for CRUD operations on this config data.
 
 ### Task 12: Settings UI for Product Context
-Build a settings page where users can add, edit, and remove their product requirements, user needs, hazard definitions, and defect criteria.  This should be a proper admin page or global page module added to the manifest.
+  - A settings page (can live in the issue panel for now, move to a proper admin page later)
+  - Simple text areas for each section — paste in your user needs, product requirements, and defect criteria as JSON or plain text
+  - Save button per section
+  - No per-item add/edit/remove UI yet — that's polish
 
 ### Task 13: Connect Config to Pipeline
 Update the pipeline to pull product context from Forge Storage instead of using hardcoded data.  When "Run Triage" is clicked, the pipeline should load the user's saved requirements, criteria, etc. and pass them into the LLM calls.
 
 ### Task 14: Results Display and Polish
 Clean up the triage results display.  Show results in a clear, readable format with risk level color coding.  Add loading states while the pipeline runs.  Handle errors gracefully (missing API key, API failures, missing config).
+    1. Clean results display with risk color coding — worth doing, the 
+  raw JSON is not presentable
+    2. Loading states — already have "Running..." on the button, could 
+  add a spinner but low value                                        
+    3. Error handling for missing API key / API failures / missing     
+  config — already have error messages for all three, so this is
+  mostly done
+    4. Loading states while pipeline runs — covered by the disabled
+  button
 
 ## Stretch Goals (Later)
 
+- refine ui
 - Add a project level triage summary page (Global Page module)
 - Batch triage multiple issues at once
 - Export triage report as a comment on the Jira issue

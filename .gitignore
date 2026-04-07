@@ -52,3 +52,10 @@ Thumbs.db
 /.forge/
 
 .env
+
+# Task 
+TASKS.md
+TASKS_v2_plan.md
+TASKS_v2_prep.md
+
+notes.md

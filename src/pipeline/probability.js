@@ -3,22 +3,21 @@ import { callAnthropic, parseJsonResponse } from './anthropicClient.js';
 /**
  * Step 2: Assess the probability that a user encounters this defect.
  *
- * @param {object} defect - Output from classifyDefect (bug_id, summary, criterion_2_failed_requirements)
- * @param {object} bug - Original bug fields: id, title, description, component, reported_by, date_reported, related_feature
+ * @param {object} defect - Output from classifyDefect (bug_id, summary, failed_requirements)
+ * @param {object} bug - Original bug fields: id, title, description, component, reported_by, date_reported
  * @param {string} apiKey
  * @returns {object} { bug_id, probability_score, probability_label, rationale }
  */
-export async function assessProbability(defect, bug, apiKey) {
-  const prompt = `You are a Quality Engineer performing a risk probability assessment for a regulated mental health Software as Medical Device (SaMD) product called MindBridge, a CBT-based therapeutic chatbot.
+export async function assessProbability(defect, bug, apiKey, productInfo, additionalContext = '', scale = []) {
+  const scaleLines = scale.map((s, i) => `${i + 1} - ${s.label}: ${s.description}`).join('\n');
+  const validLabels = scale.map(s => `"${s.label}"`).join(' or ');
+
+  const prompt = `You are a Quality Engineer performing a risk probability assessment for a ${productInfo.type} product called ${productInfo.name}, ${productInfo.description}.
 
 Your task is to assess the PROBABILITY that this defect will occur for users of the product.
 
 PROBABILITY SCALE:
-1 - Remote: unlikely to occur
-2 - Low: could occur but rare
-3 - Moderate: may occur occasionally
-4 - High: likely to occur
-5 - Very High: almost certain to occur
+${scaleLines}
 
 FACTORS TO CONSIDER:
 - How many users are likely to encounter the conditions that trigger this bug?
@@ -30,24 +29,28 @@ FACTORS TO CONSIDER:
 DEFECT TO ASSESS:
 Bug ID: ${defect.bug_id}
 Classification Summary: ${defect.summary}
-Failed Requirements: ${JSON.stringify(defect.criterion_2_failed_requirements)}
+Failed Requirements: ${JSON.stringify(defect.failed_requirements)}
 
 ORIGINAL BUG DETAILS:
 Title: ${bug.title}
 Description: ${bug.description}
 Component: ${bug.component}
 Reported By: ${bug.reported_by}
-
+${bug.comments?.length ? `\nCOMMENTS (${bug.comments.length}):\n${bug.comments.map(c => `[${c.date}] ${c.author}: ${c.body}`).join('\n\n')}` : ''}
+${additionalContext ? `\nADDITIONAL CONTEXT:\n${additionalContext}\n` : ''}
 INSTRUCTIONS:
-Assess the probability that a user of the MindBridge product will encounter this defect during normal use. Base your assessment on the evidence available in the bug report, considering the factors listed above. Do not speculate beyond what is stated.
+Assess the probability that a user of the ${productInfo.name} product will encounter this defect during normal use. Base your assessment on the evidence available in the bug report, considering the factors listed above. Do not speculate beyond what is stated.
 
 Respond in the following JSON format only, no other text:
 {
     "bug_id": "${defect.bug_id}",
     "probability_score": 1 to 5,
-    "probability_label": "Remote" or "Low" or "Moderate" or "High" or "Very High",
-    "rationale": "two to three sentence explanation grounded in specific evidence from the bug report"
-}`;
+    "probability_label": ${validLabels},
+    "rationale": "two to three sentence explanation grounded in specific evidence from the bug report",
+    "references": [{ "source": "Comment by [author] [date]", "quote": "relevant excerpt that influenced this conclusion" }]
+}
+
+Only include entries in "references" for comments that meaningfully influenced your probability assessment. Use an empty array if no comments were relied upon.`;
 
   const responseText = await callAnthropic(prompt, apiKey);
   return parseJsonResponse(responseText);
