@@ -5,11 +5,16 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "deploy": "npm run build --prefix static/hello-world && npx @forge/cli deploy"
+    "deploy": "npm run build --prefix static/ui && npx @forge/cli deploy",
+    "test": "jest"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.2",
+    "babel-jest": "^30.3.0",
     "eslint": "^8.56.0",
-    "eslint-plugin-react-hooks": "^4.6.0"
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "jest": "^30.3.0"
   },
   "dependencies": {
     "@forge/api": "7.1.2",
