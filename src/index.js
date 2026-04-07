@@ -4,7 +4,7 @@ import {
   saveApiKey, hasApiKey, deleteApiKey, getApiKey,
   saveUserNeeds, getUserNeeds,
   saveProductRequirements, getProductRequirements,
-  saveDefectCriteria, getDefectCriteria,
+  saveAdditionalContext,
   getProductContext,
   savePostCommentSetting, getPostCommentSetting,
   saveProductInfo, getProductInfo,
@@ -169,10 +169,11 @@ resolver.define('saveProductRequirements', async (req) => {
   return { success: true };
 });
 
-resolver.define('saveDefectCriteria', async (req) => {
-  await saveDefectCriteria(req.payload.defectCriteria);
+resolver.define('saveAdditionalContext', async (req) => {
+  await saveAdditionalContext(req.payload.additionalContext);
   return { success: true };
 });
+
 
 resolver.define('getProductInfo', async () => {
   return await getProductInfo();
@@ -198,23 +199,21 @@ resolver.define('runTriage', async (req) => {
   const apiKey = await getApiKey();
   if (!apiKey) throw new Error('No API key saved. Please configure your Anthropic API key in settings.');
 
-  const { userNeeds, productRequirements, defectCriteria } = await getProductContext();
+  const { userNeeds, productRequirements, additionalContext } = await getProductContext();
 
   if (!userNeeds.length || !productRequirements.length) {
     throw new Error('Product context not configured. Please add user needs and product requirements in Settings.');
-  }
-  if (!defectCriteria.must_meet_both?.length) {
-    throw new Error('Defect criteria not configured. Please add defect criteria in Settings.');
   }
 
   const productContext = {
     user_needs: userNeeds,
     product_requirements: productRequirements,
+    additional_context: additionalContext,
   };
 
   const productInfo = await getProductInfo();
 
-  const report = await runPipeline(bug, productContext, defectCriteria, apiKey, productInfo);
+  const report = await runPipeline(bug, productContext, apiKey, productInfo);
 
   const postCommentEnabled = await getPostCommentSetting();
   if (postCommentEnabled) {

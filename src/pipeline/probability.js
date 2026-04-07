@@ -8,7 +8,7 @@ import { callAnthropic, parseJsonResponse } from './anthropicClient.js';
  * @param {string} apiKey
  * @returns {object} { bug_id, probability_score, probability_label, rationale }
  */
-export async function assessProbability(defect, bug, apiKey, productInfo) {
+export async function assessProbability(defect, bug, apiKey, productInfo, additionalContext = '') {
   const prompt = `You are a Quality Engineer performing a risk probability assessment for a ${productInfo.type} product called ${productInfo.name}, ${productInfo.description}.
 
 Your task is to assess the PROBABILITY that this defect will occur for users of the product.
@@ -38,7 +38,7 @@ Description: ${bug.description}
 Component: ${bug.component}
 Reported By: ${bug.reported_by}
 ${bug.comments?.length ? `\nCOMMENTS (${bug.comments.length}):\n${bug.comments.map(c => `[${c.date}] ${c.author}: ${c.body}`).join('\n\n')}` : ''}
-
+${additionalContext ? `\nADDITIONAL CONTEXT:\n${additionalContext}\n` : ''}
 INSTRUCTIONS:
 Assess the probability that a user of the ${productInfo.name} product will encounter this defect during normal use. Base your assessment on the evidence available in the bug report, considering the factors listed above. Do not speculate beyond what is stated.
 

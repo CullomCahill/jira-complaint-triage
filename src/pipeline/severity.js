@@ -9,7 +9,7 @@ import { callAnthropic, parseJsonResponse } from './anthropicClient.js';
  * @param {string} apiKey
  * @returns {object} { bug_id, severity_score, severity_label, rationale }
  */
-export async function assessSeverity(defect, bug, apiKey, productInfo) {
+export async function assessSeverity(defect, bug, apiKey, productInfo, additionalContext = '') {
   const prompt = `You are a Quality Engineer performing a risk severity assessment for a ${productInfo.type} product called ${productInfo.name}, ${productInfo.description}.
 
 Your task is to assess the SEVERITY of harm that could result if this defect occurs.
@@ -41,7 +41,7 @@ Description: ${bug.description}
 Component: ${bug.component}
 Reported By: ${bug.reported_by}
 ${bug.comments?.length ? `\nCOMMENTS (${bug.comments.length}):\n${bug.comments.map(c => `[${c.date}] ${c.author}: ${c.body}`).join('\n\n')}` : ''}
-
+${additionalContext ? `\nADDITIONAL CONTEXT:\n${additionalContext}\n` : ''}
 INSTRUCTIONS:
 Assess the severity of harm that could result from this defect. Ground your rationale in the specific impact on users of the ${productInfo.name} product. Be realistic and do not inflate severity beyond what is supported by the evidence.
 

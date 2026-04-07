@@ -5,11 +5,12 @@ import { callAnthropic, parseJsonResponse } from './anthropicClient.js';
  *
  * @param {object} bug - Bug fields: id, title, description, component, reported_by, date_reported
  * @param {object} productContext - { user_needs: [...], product_requirements: [...] }
- * @param {object} defectCriteria - { must_meet_both: [string, string] }
  * @param {string} apiKey
  * @returns {object} Structured defect classification result
  */
-export async function classifyDefect(bug, productContext, defectCriteria, apiKey, productInfo) {
+const DEFECT_CRITERION = 'It is a deviation from the intended function of the core product (fails a User Need or Product Requirement)';
+
+export async function classifyDefect(bug, productContext, apiKey, productInfo) {
   const cleanBug = {
     id: bug.id,
     title: bug.title,
@@ -25,14 +26,14 @@ export async function classifyDefect(bug, productContext, defectCriteria, apiKey
 Your task is to determine whether the following bug qualifies as a DEFECT.
 
 DEFECT CRITERION:
-${defectCriteria.must_meet_both[0]}
+${DEFECT_CRITERION}
 
 USER NEEDS:
 ${JSON.stringify(productContext.user_needs, null, 2)}
 
 PRODUCT REQUIREMENTS:
 ${JSON.stringify(productContext.product_requirements, null, 2)}
-
+${productContext.additional_context ? `\nADDITIONAL CONTEXT:\n${productContext.additional_context}\n` : ''}
 BUG TO CLASSIFY:
 ${JSON.stringify(cleanBug, null, 2)}
 

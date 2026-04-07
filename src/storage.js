@@ -24,7 +24,6 @@ export async function deleteApiKey() {
 const KEYS = {
   userNeeds: 'product-user-needs',
   productRequirements: 'product-requirements',
-  defectCriteria: 'product-defect-criteria',
 };
 
 export async function saveUserNeeds(userNeeds) {
@@ -43,13 +42,6 @@ export async function getProductRequirements() {
   return await kvs.get(KEYS.productRequirements) ?? [];
 }
 
-export async function saveDefectCriteria(criteria) {
-  await kvs.set(KEYS.defectCriteria, criteria);
-}
-
-export async function getDefectCriteria() {
-  return await kvs.get(KEYS.defectCriteria) ?? { must_meet_both: [] };
-}
 
 export async function saveProductInfo(productInfo) {
   await kvs.set('product-info', productInfo);
@@ -72,11 +64,19 @@ export async function getPostCommentSetting() {
   return val ?? true; // default on
 }
 
+export async function saveAdditionalContext(text) {
+  await kvs.set('product-additional-context', text);
+}
+
+export async function getAdditionalContext() {
+  return await kvs.get('product-additional-context') ?? '';
+}
+
 export async function getProductContext() {
-  const [userNeeds, productRequirements, defectCriteria] = await Promise.all([
+  const [userNeeds, productRequirements, additionalContext] = await Promise.all([
     getUserNeeds(),
     getProductRequirements(),
-    getDefectCriteria(),
+    getAdditionalContext(),
   ]);
-  return { userNeeds, productRequirements, defectCriteria };
+  return { userNeeds, productRequirements, additionalContext };
 }

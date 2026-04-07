@@ -65,53 +65,6 @@ function ConfigSection({ label, hint, storageKey, saveResolver, onDirtyChange })
   );
 }
 
-function DefectCriteriaSection({ onDirtyChange }) {
-  const [criterion, setCriterion] = useState('');
-  const [saved, setSaved] = useState(false);
-
-  useEffect(() => {
-    invoke('getProductContext').then((ctx) => {
-      const val = ctx['defectCriteria'];
-      const text = val?.must_meet_both?.[0] ?? '';
-      if (text) { setCriterion(text); setSaved(true); }
-    });
-  }, []);
-
-  const handleChange = (e) => {
-    setCriterion(e.target.value);
-    setSaved(false);
-    onDirtyChange('defectCriteria', true);
-  };
-
-  const handleSave = async () => {
-    await invoke('saveDefectCriteria', { defectCriteria: { must_meet_both: [criterion] } });
-    setSaved(true);
-    onDirtyChange('defectCriteria', false);
-  };
-
-  return (
-    <div style={{ marginBottom: '20px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
-        <strong style={{ fontSize: '13px' }}>Defect Criteria</strong>
-        {saved && <span style={{ marginLeft: '8px', color: 'green', fontSize: '12px' }}>&#10003; saved</span>}
-      </div>
-      <p style={{ fontSize: '11px', color: '#666', margin: '0 0 6px' }}>
-        The condition that must be true for a complaint to be classified as a defect.
-      </p>
-      <p style={{ fontSize: '11px', color: '#bf8600', background: '#fffae6', border: '1px solid #ffe380', borderRadius: '3px', padding: '5px 8px', margin: '0 0 8px' }}>
-        Note: this tool assumes all issues passed to it are included in the released product. Only run triage on tickets you have already confirmed relate to released features.
-      </p>
-      <textarea
-        style={{ ...textareaStyle, minHeight: '60px' }}
-        value={criterion}
-        placeholder="e.g. It is a deviation from the intended function of the core product (fails a User Need or Product Requirement)"
-        onChange={handleChange}
-        spellCheck={false}
-      />
-      <button onClick={handleSave}>Save Defect Criteria</button>
-    </div>
-  );
-}
 
 function SettingsPanel({ onBack }) {
   const [keyExists, setKeyExists] = useState(null);
@@ -122,6 +75,8 @@ function SettingsPanel({ onBack }) {
   const [confirmingBack, setConfirmingBack] = useState(false);
   const [productInfo, setProductInfo] = useState({ name: '', type: '', description: '' });
   const [productInfoSaved, setProductInfoSaved] = useState(false);
+  const [additionalContext, setAdditionalContext] = useState('');
+  const [additionalContextSaved, setAdditionalContextSaved] = useState(false);
 
   const isDirty = Object.values(dirtyMap).some(Boolean) || inputValue.trim().length > 0 || dirtyMap['productInfo'];
 
@@ -129,6 +84,9 @@ function SettingsPanel({ onBack }) {
     invoke('getApiKeyStatus').then(({ exists }) => setKeyExists(exists));
     invoke('getPostCommentSetting').then(({ enabled }) => setPostComment(enabled));
     invoke('getProductInfo').then(setProductInfo);
+    invoke('getProductContext').then(({ additionalContext: ctx }) => {
+      if (ctx) { setAdditionalContext(ctx); setAdditionalContextSaved(true); }
+    });
   }, []);
 
   const handleDirtyChange = (key, dirty) => {
@@ -145,6 +103,12 @@ function SettingsPanel({ onBack }) {
     await invoke('saveProductInfo', productInfo);
     setProductInfoSaved(true);
     setDirtyMap(prev => ({ ...prev, productInfo: false }));
+  };
+
+  const handleSaveAdditionalContext = async () => {
+    await invoke('saveAdditionalContext', { additionalContext });
+    setAdditionalContextSaved(true);
+    setDirtyMap(prev => ({ ...prev, additionalContext: false }));
   };
 
   const handlePostCommentToggle = async (e) => {
@@ -257,6 +221,24 @@ function SettingsPanel({ onBack }) {
 
       <hr style={{ margin: '0 0 16px' }} />
 
+      <div style={{ marginBottom: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+          <strong style={{ fontSize: '13px' }}>Additional Context</strong>
+          {additionalContextSaved && <span style={{ marginLeft: '8px', color: 'green', fontSize: '12px' }}>&#10003; saved</span>}
+        </div>
+        <p style={{ fontSize: '11px', color: '#666', margin: '0 0 6px' }}>
+          Free-form context injected into every prompt. Use this for anything product-specific that isn't captured by the structured fields above — regulatory context, risk tolerance guidance, known edge cases, etc.
+        </p>
+        <textarea
+          style={textareaStyle}
+          value={additionalContext}
+          placeholder="e.g. This product is a Class IIa medical device regulated under EU MDR. Severity scores should account for the vulnerability of the patient population..."
+          onChange={(e) => { setAdditionalContext(e.target.value); setAdditionalContextSaved(false); setDirtyMap(prev => ({ ...prev, additionalContext: true })); }}
+          spellCheck={false}
+        />
+        <button onClick={handleSaveAdditionalContext}>Save Additional Context</button>
+      </div>
+
       <ConfigSection
         label="User Needs"
         hint='JSON array of objects with "id" and "description" fields.'
@@ -272,8 +254,6 @@ function SettingsPanel({ onBack }) {
         saveResolver="saveProductRequirements"
         onDirtyChange={handleDirtyChange}
       />
-
-      <DefectCriteriaSection onDirtyChange={handleDirtyChange} />
     </div>
   );
 }
