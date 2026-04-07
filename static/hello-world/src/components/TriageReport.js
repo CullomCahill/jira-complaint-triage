@@ -84,6 +84,19 @@ function ScoreRow({ label, score, scoreLabel, rationale }) {
 
 function References({ refs }) {
   if (!refs?.length) return null;
+
+  // Deduplicate by source + quote, merging step labels
+  const seen = new Map();
+  for (const r of refs) {
+    const key = `${r.source}|||${r.quote}`;
+    if (seen.has(key)) {
+      seen.get(key).steps.push(r.step);
+    } else {
+      seen.set(key, { source: r.source, quote: r.quote, steps: [r.step] });
+    }
+  }
+  const deduped = Array.from(seen.values());
+
   return (
     <div style={{ marginTop: '12px', borderTop: '1px solid #dfe1e6', paddingTop: '12px' }}>
       <p style={{
@@ -96,7 +109,7 @@ function References({ refs }) {
       }}>
         Evidence
       </p>
-      {refs.map((r, i) => (
+      {deduped.map((r, i) => (
         <div key={i} style={{
           marginBottom: '6px',
           padding: '8px 10px',
@@ -104,19 +117,21 @@ function References({ refs }) {
           border: '1px solid #dfe1e6',
           borderRadius: '3px',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '5px' }}>
-            <span style={{
-              fontSize: '9px',
-              fontWeight: 700,
-              color: '#fff',
-              background: '#6b778c',
-              padding: '1px 5px',
-              borderRadius: '2px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-            }}>
-              {r.step}
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '5px', flexWrap: 'wrap' }}>
+            {r.steps.map(s => (
+              <span key={s} style={{
+                fontSize: '9px',
+                fontWeight: 700,
+                color: '#fff',
+                background: '#6b778c',
+                padding: '1px 5px',
+                borderRadius: '2px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+              }}>
+                {s}
+              </span>
+            ))}
             <span style={{ fontSize: '11px', color: '#6b778c' }}>{r.source}</span>
           </div>
           <p style={{
@@ -136,7 +151,23 @@ function References({ refs }) {
   );
 }
 
-function TriageReport({ report }) {
+function FailedItems({ ids, items, idKey, descKey }) {
+  if (!ids?.length) return <span style={{ fontSize: '12px', color: '#172b4d' }}>None</span>;
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+      {ids.map(id => {
+        const match = items?.find(item => item[idKey] === id);
+        return (
+          <span key={id} style={{ fontSize: '12px', color: '#172b4d', lineHeight: '1.5' }}>
+            <strong>{id}</strong>{match ? ` — ${match[descKey]}` : ''}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+function TriageReport({ report, userNeeds = [], productRequirements = [] }) {
   if (report.error) {
     return (
       <div style={{
@@ -209,9 +240,15 @@ function TriageReport({ report }) {
 
       {/* Key/value rows */}
       <div style={{ marginBottom: '10px' }}>
-        <Row label="Disposition"         value={report.disposition} />
-        <Row label="Failed Requirements" value={report.failed_requirements.join(', ') || 'None'} />
-        <Row label="Failed User Needs"   value={report.failed_user_needs.join(', ') || 'None'} />
+        <Row label="Disposition" value={report.disposition} />
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '6px', alignItems: 'flex-start' }}>
+          <Label>Failed Requirements</Label>
+          <FailedItems ids={report.failed_requirements} items={productRequirements} idKey="id" descKey="description" />
+        </div>
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '6px', alignItems: 'flex-start' }}>
+          <Label>Failed User Needs</Label>
+          <FailedItems ids={report.failed_user_needs} items={userNeeds} idKey="id" descKey="description" />
+        </div>
       </div>
 
       {/* Probability + Severity with score pills */}

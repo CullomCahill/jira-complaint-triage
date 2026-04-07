@@ -7,9 +7,11 @@ function TriagePanel({ onSettings }) {
   const [issueData, setIssueData] = useState(null);
   const [report, setReport] = useState(null);
   const [running, setRunning] = useState(false);
+  const [productContext, setProductContext] = useState({ userNeeds: [], productRequirements: [] });
 
   useEffect(() => {
     invoke('getIssueData').then(setIssueData).catch(() => setIssueData({ error: 'Failed to load issue data' }));
+    invoke('getProductContext').then(setProductContext);
   }, []);
 
   const handleRunTriage = async () => {
@@ -82,7 +84,7 @@ function TriagePanel({ onSettings }) {
         </div>
       )}
 
-      {report && <TriageReport report={report} />}
+      {report && <TriageReport report={report} userNeeds={productContext.userNeeds} productRequirements={productContext.productRequirements} />}
     </div>
   );
 }
