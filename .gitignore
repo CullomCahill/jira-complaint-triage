@@ -59,3 +59,12 @@ TASKS_v2_plan.md
 TASKS_v2_prep.md
 
 notes.md
+
+# Internal planning docs
+reference/marketplace_sub_docs/
+reference/MARKETPLACE_SUBMISSION.md
+reference/LANDING_PAGE_COPY.md
+reference/VIDEO_WALKTHROUGH_SCRIPT.md
+
+# Python bytecode
+reference/pipeline/__pycache__/
