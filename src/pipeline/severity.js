@@ -9,17 +9,16 @@ import { callAnthropic, parseJsonResponse } from './anthropicClient.js';
  * @param {string} apiKey
  * @returns {object} { bug_id, severity_score, severity_label, rationale }
  */
-export async function assessSeverity(defect, bug, apiKey, productInfo, additionalContext = '') {
+export async function assessSeverity(defect, bug, apiKey, productInfo, additionalContext = '', scale = []) {
+  const scaleLines = scale.map((s, i) => `${i + 1} - ${s.label}: ${s.description}`).join('\n');
+  const validLabels = scale.map(s => `"${s.label}"`).join(' or ');
+
   const prompt = `You are a Quality Engineer performing a risk severity assessment for a ${productInfo.type} product called ${productInfo.name}, ${productInfo.description}.
 
 Your task is to assess the SEVERITY of harm that could result if this defect occurs.
 
 SEVERITY SCALE:
-1 - Negligible: no impact on therapeutic experience
-2 - Minor: slight inconvenience, user can continue
-3 - Moderate: disrupts session but user can recover
-4 - Major: prevents therapeutic function or causes distress
-5 - Critical: potential for clinical harm or safety event
+${scaleLines}
 
 FACTORS TO CONSIDER:
 - What is the worst realistic outcome if a user encounters this defect?
@@ -49,7 +48,7 @@ Respond in the following JSON format only, no other text:
 {
     "bug_id": "${defect.bug_id}",
     "severity_score": 1 to 5,
-    "severity_label": "Negligible" or "Minor" or "Moderate" or "Major" or "Critical",
+    "severity_label": ${validLabels},
     "rationale": "two to three sentence explanation focused on the realistic impact to the user",
     "references": [{ "source": "Comment by [author] [date]", "quote": "relevant excerpt that influenced this conclusion" }]
 }

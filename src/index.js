@@ -5,6 +5,8 @@ import {
   saveUserNeeds, getUserNeeds,
   saveProductRequirements, getProductRequirements,
   saveAdditionalContext,
+  saveProbabilityScale, getProbabilityScale,
+  saveSeverityScale, getSeverityScale,
   getProductContext,
   savePostCommentSetting, getPostCommentSetting,
   saveProductInfo, getProductInfo,
@@ -188,6 +190,21 @@ resolver.define('saveAdditionalContext', async (req) => {
   return { success: true };
 });
 
+resolver.define('getScales', async () => {
+  const [probabilityScale, severityScale] = await Promise.all([getProbabilityScale(), getSeverityScale()]);
+  return { probabilityScale, severityScale };
+});
+
+resolver.define('saveProbabilityScale', async (req) => {
+  await saveProbabilityScale(req.payload.scale);
+  return { success: true };
+});
+
+resolver.define('saveSeverityScale', async (req) => {
+  await saveSeverityScale(req.payload.scale);
+  return { success: true };
+});
+
 
 resolver.define('getProductInfo', async () => {
   return await getProductInfo();
@@ -225,9 +242,13 @@ resolver.define('runTriage', async (req) => {
     additional_context: additionalContext,
   };
 
-  const productInfo = await getProductInfo();
+  const [productInfo, probabilityScale, severityScale] = await Promise.all([
+    getProductInfo(),
+    getProbabilityScale(),
+    getSeverityScale(),
+  ]);
 
-  const report = await runPipeline(bug, productContext, apiKey, productInfo);
+  const report = await runPipeline(bug, productContext, apiKey, productInfo, probabilityScale, severityScale);
 
   const postCommentEnabled = await getPostCommentSetting();
   if (postCommentEnabled) {

@@ -8,17 +8,16 @@ import { callAnthropic, parseJsonResponse } from './anthropicClient.js';
  * @param {string} apiKey
  * @returns {object} { bug_id, probability_score, probability_label, rationale }
  */
-export async function assessProbability(defect, bug, apiKey, productInfo, additionalContext = '') {
+export async function assessProbability(defect, bug, apiKey, productInfo, additionalContext = '', scale = []) {
+  const scaleLines = scale.map((s, i) => `${i + 1} - ${s.label}: ${s.description}`).join('\n');
+  const validLabels = scale.map(s => `"${s.label}"`).join(' or ');
+
   const prompt = `You are a Quality Engineer performing a risk probability assessment for a ${productInfo.type} product called ${productInfo.name}, ${productInfo.description}.
 
 Your task is to assess the PROBABILITY that this defect will occur for users of the product.
 
 PROBABILITY SCALE:
-1 - Remote: unlikely to occur
-2 - Low: could occur but rare
-3 - Moderate: may occur occasionally
-4 - High: likely to occur
-5 - Very High: almost certain to occur
+${scaleLines}
 
 FACTORS TO CONSIDER:
 - How many users are likely to encounter the conditions that trigger this bug?
@@ -46,7 +45,7 @@ Respond in the following JSON format only, no other text:
 {
     "bug_id": "${defect.bug_id}",
     "probability_score": 1 to 5,
-    "probability_label": "Remote" or "Low" or "Moderate" or "High" or "Very High",
+    "probability_label": ${validLabels},
     "rationale": "two to three sentence explanation grounded in specific evidence from the bug report",
     "references": [{ "source": "Comment by [author] [date]", "quote": "relevant excerpt that influenced this conclusion" }]
 }

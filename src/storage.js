@@ -64,6 +64,38 @@ export async function getPostCommentSetting() {
   return val ?? true; // default on
 }
 
+const DEFAULT_PROBABILITY_SCALE = [
+  { label: 'Remote',    description: 'unlikely to occur' },
+  { label: 'Low',       description: 'could occur but rare' },
+  { label: 'Moderate',  description: 'may occur occasionally' },
+  { label: 'High',      description: 'likely to occur' },
+  { label: 'Very High', description: 'almost certain to occur' },
+];
+
+const DEFAULT_SEVERITY_SCALE = [
+  { label: 'Negligible', description: 'no impact on therapeutic experience' },
+  { label: 'Minor',      description: 'slight inconvenience, user can continue' },
+  { label: 'Moderate',   description: 'disrupts session but user can recover' },
+  { label: 'Major',      description: 'prevents therapeutic function or causes distress' },
+  { label: 'Critical',   description: 'potential for clinical harm or safety event' },
+];
+
+export async function saveProbabilityScale(scale) {
+  await kvs.set('probability-scale', scale);
+}
+
+export async function getProbabilityScale() {
+  return await kvs.get('probability-scale') ?? DEFAULT_PROBABILITY_SCALE;
+}
+
+export async function saveSeverityScale(scale) {
+  await kvs.set('severity-scale', scale);
+}
+
+export async function getSeverityScale() {
+  return await kvs.get('severity-scale') ?? DEFAULT_SEVERITY_SCALE;
+}
+
 export async function saveAdditionalContext(text) {
   await kvs.set('product-additional-context', text);
 }

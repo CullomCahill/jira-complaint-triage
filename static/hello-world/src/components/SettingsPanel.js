@@ -66,6 +66,84 @@ function ConfigSection({ label, hint, storageKey, saveResolver, onDirtyChange })
 }
 
 
+const DEFAULT_PROBABILITY_SCALE = [
+  { label: 'Remote',    description: 'unlikely to occur' },
+  { label: 'Low',       description: 'could occur but rare' },
+  { label: 'Moderate',  description: 'may occur occasionally' },
+  { label: 'High',      description: 'likely to occur' },
+  { label: 'Very High', description: 'almost certain to occur' },
+];
+
+const DEFAULT_SEVERITY_SCALE = [
+  { label: 'Negligible', description: 'no impact on therapeutic experience' },
+  { label: 'Minor',      description: 'slight inconvenience, user can continue' },
+  { label: 'Moderate',   description: 'disrupts session but user can recover' },
+  { label: 'Major',      description: 'prevents therapeutic function or causes distress' },
+  { label: 'Critical',   description: 'potential for clinical harm or safety event' },
+];
+
+function ScaleEditor({ label, hint, scaleKey, saveResolver, initialScale, onDirtyChange }) {
+  const [scale, setScale] = useState(initialScale);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => { setScale(initialScale); }, [initialScale]);
+
+  const handleChange = (index, field, value) => {
+    setScale(prev => prev.map((item, i) => i === index ? { ...item, [field]: value } : item));
+    setSaved(false);
+    onDirtyChange(scaleKey, true);
+  };
+
+  const handleSave = async () => {
+    await invoke(saveResolver, { scale });
+    setSaved(true);
+    onDirtyChange(scaleKey, false);
+  };
+
+  return (
+    <div style={{ marginBottom: '20px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+        <strong style={{ fontSize: '13px' }}>{label}</strong>
+        {saved && <span style={{ marginLeft: '8px', color: 'green', fontSize: '12px' }}>&#10003; saved</span>}
+      </div>
+      <p style={{ fontSize: '11px', color: '#666', margin: '0 0 8px' }}>{hint}</p>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+        <thead>
+          <tr>
+            <th style={{ width: '24px', textAlign: 'left', fontSize: '10px', color: '#6b778c', fontWeight: 700, paddingBottom: '4px' }}>#</th>
+            <th style={{ width: '90px', textAlign: 'left', fontSize: '10px', color: '#6b778c', fontWeight: 700, paddingBottom: '4px', paddingLeft: '6px' }}>Label</th>
+            <th style={{ textAlign: 'left', fontSize: '10px', color: '#6b778c', fontWeight: 700, paddingBottom: '4px', paddingLeft: '6px' }}>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {scale.map((item, i) => (
+            <tr key={i}>
+              <td style={{ verticalAlign: 'middle', color: '#6b778c', fontWeight: 700, paddingRight: '4px' }}>{i + 1}</td>
+              <td style={{ paddingRight: '6px', paddingBottom: '4px' }}>
+                <input
+                  type="text"
+                  value={item.label}
+                  onChange={e => handleChange(i, 'label', e.target.value)}
+                  style={{ width: '100%', padding: '4px 6px', fontSize: '12px', boxSizing: 'border-box' }}
+                />
+              </td>
+              <td style={{ paddingBottom: '4px' }}>
+                <input
+                  type="text"
+                  value={item.description}
+                  onChange={e => handleChange(i, 'description', e.target.value)}
+                  style={{ width: '100%', padding: '4px 6px', fontSize: '12px', boxSizing: 'border-box' }}
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <button onClick={handleSave} style={{ marginTop: '6px' }}>Save {label}</button>
+    </div>
+  );
+}
+
 function SettingsPanel({ onBack }) {
   const [keyExists, setKeyExists] = useState(null);
   const [inputValue, setInputValue] = useState('');
@@ -77,6 +155,8 @@ function SettingsPanel({ onBack }) {
   const [productInfoSaved, setProductInfoSaved] = useState(false);
   const [additionalContext, setAdditionalContext] = useState('');
   const [additionalContextSaved, setAdditionalContextSaved] = useState(false);
+  const [probabilityScale, setProbabilityScale] = useState(DEFAULT_PROBABILITY_SCALE);
+  const [severityScale, setSeverityScale] = useState(DEFAULT_SEVERITY_SCALE);
 
   const isDirty = Object.values(dirtyMap).some(Boolean) || inputValue.trim().length > 0 || dirtyMap['productInfo'];
 
@@ -86,6 +166,10 @@ function SettingsPanel({ onBack }) {
     invoke('getProductInfo').then(setProductInfo);
     invoke('getProductContext').then(({ additionalContext: ctx }) => {
       if (ctx) { setAdditionalContext(ctx); setAdditionalContextSaved(true); }
+    });
+    invoke('getScales').then(({ probabilityScale: ps, severityScale: ss }) => {
+      if (ps) setProbabilityScale(ps);
+      if (ss) setSeverityScale(ss);
     });
   }, []);
 
@@ -252,6 +336,26 @@ function SettingsPanel({ onBack }) {
         hint='JSON array of objects with "id", "description", and "traces_to" fields.'
         storageKey="productRequirements"
         saveResolver="saveProductRequirements"
+        onDirtyChange={handleDirtyChange}
+      />
+
+      <hr style={{ margin: '0 0 16px' }} />
+
+      <ScaleEditor
+        label="Probability Scale"
+        hint="Labels and descriptions for each probability level (1 = lowest, 5 = highest)."
+        scaleKey="probabilityScale"
+        saveResolver="saveProbabilityScale"
+        initialScale={probabilityScale}
+        onDirtyChange={handleDirtyChange}
+      />
+
+      <ScaleEditor
+        label="Severity Scale"
+        hint="Labels and descriptions for each severity level (1 = lowest, 5 = highest)."
+        scaleKey="severityScale"
+        saveResolver="saveSeverityScale"
+        initialScale={severityScale}
         onDirtyChange={handleDirtyChange}
       />
     </div>
