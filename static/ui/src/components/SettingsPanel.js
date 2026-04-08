@@ -14,6 +14,7 @@ const textareaStyle = {
 function ConfigSection({ label, hint, storageKey, saveResolver, onDirtyChange, registerSave }) {
   const [text, setText] = useState('');
   const [saved, setSaved] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const [error, setError] = useState('');
   const handleSaveRef = useRef(null);
 
@@ -34,6 +35,7 @@ function ConfigSection({ label, hint, storageKey, saveResolver, onDirtyChange, r
   const handleChange = (e) => {
     setText(e.target.value);
     setSaved(false);
+    setDirty(true);
     onDirtyChange(storageKey, true);
   };
 
@@ -48,6 +50,7 @@ function ConfigSection({ label, hint, storageKey, saveResolver, onDirtyChange, r
     }
     await invoke(saveResolver, { [storageKey]: parsed });
     setSaved(true);
+    setDirty(false);
     onDirtyChange(storageKey, false);
   };
 
@@ -58,6 +61,7 @@ function ConfigSection({ label, hint, storageKey, saveResolver, onDirtyChange, r
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
         <strong style={{ fontSize: '13px' }}>{label}</strong>
         {saved && <span style={{ marginLeft: '8px', color: 'green', fontSize: '12px' }}>&#10003; saved</span>}
+        {dirty && !saved && <span style={{ marginLeft: '8px', color: '#ff991f', fontSize: '12px' }}>&#9679; unsaved</span>}
       </div>
       <p style={{ fontSize: '11px', color: '#666', margin: '0 0 4px' }}>{hint}</p>
       <textarea
@@ -103,7 +107,7 @@ const DEFAULT_RISK_MATRIX = {
   5: { 1: 'HIGH',   2: 'HIGH',   3: 'HIGH',   4: 'HIGH',   5: 'HIGH'   },
 };
 
-function RiskMatrixEditor({ matrix, probabilityScale, severityScale, onMatrixChange, onDirtyChange, onSave, saved }) {
+function RiskMatrixEditor({ matrix, probabilityScale, severityScale, onMatrixChange, onDirtyChange, onSave, saved, dirty }) {
   const cycleLevel = (sev, prob) => {
     const current = matrix?.[sev]?.[prob] ?? matrix?.[String(sev)]?.[String(prob)] ?? DEFAULT_RISK_MATRIX[sev][prob];
     const idx = RISK_LEVELS.indexOf(current);
@@ -129,6 +133,7 @@ function RiskMatrixEditor({ matrix, probabilityScale, severityScale, onMatrixCha
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
         <strong style={{ fontSize: '13px' }}>Risk Matrix</strong>
         {saved && <span style={{ marginLeft: '8px', color: 'green', fontSize: '12px' }}>&#10003; saved</span>}
+        {dirty && !saved && <span style={{ marginLeft: '8px', color: '#ff991f', fontSize: '12px' }}>&#9679; unsaved</span>}
       </div>
       <p style={{ fontSize: '11px', color: '#666', margin: '0 0 8px' }}>
         Click any cell to cycle its risk level. Rows = Severity (5 top, 1 bottom). Columns = Probability (1 left, 5 right).
@@ -200,6 +205,7 @@ function RiskMatrixEditor({ matrix, probabilityScale, severityScale, onMatrixCha
 function ScaleEditor({ label, hint, scaleKey, saveResolver, initialScale, onDirtyChange, registerSave }) {
   const [scale, setScale] = useState(initialScale);
   const [saved, setSaved] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const handleSaveRef = useRef(null);
 
   useEffect(() => { setScale(initialScale); }, [initialScale]);
@@ -211,12 +217,14 @@ function ScaleEditor({ label, hint, scaleKey, saveResolver, initialScale, onDirt
   const handleChange = (index, field, value) => {
     setScale(prev => prev.map((item, i) => i === index ? { ...item, [field]: value } : item));
     setSaved(false);
+    setDirty(true);
     onDirtyChange(scaleKey, true);
   };
 
   const handleSave = async () => {
     await invoke(saveResolver, { scale });
     setSaved(true);
+    setDirty(false);
     onDirtyChange(scaleKey, false);
   };
 
@@ -227,6 +235,7 @@ function ScaleEditor({ label, hint, scaleKey, saveResolver, initialScale, onDirt
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
         <strong style={{ fontSize: '13px' }}>{label}</strong>
         {saved && <span style={{ marginLeft: '8px', color: 'green', fontSize: '12px' }}>&#10003; saved</span>}
+        {dirty && !saved && <span style={{ marginLeft: '8px', color: '#ff991f', fontSize: '12px' }}>&#9679; unsaved</span>}
       </div>
       <p style={{ fontSize: '11px', color: '#666', margin: '0 0 8px' }}>{hint}</p>
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
@@ -447,6 +456,7 @@ function SettingsPanel({ onBack }) {
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
           <strong style={{ fontSize: '13px' }}>Product Info</strong>
           {productInfoSaved && <span style={{ marginLeft: '8px', color: 'green', fontSize: '12px' }}>&#10003; saved</span>}
+          {dirtyMap.productInfo && !productInfoSaved && <span style={{ marginLeft: '8px', color: '#ff991f', fontSize: '12px' }}>&#9679; unsaved</span>}
         </div>
         <p style={{ fontSize: '11px', color: '#666', margin: '0 0 8px' }}>Used to personalise the risk assessment prompts to your product.</p>
         {[
@@ -474,6 +484,7 @@ function SettingsPanel({ onBack }) {
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
           <strong style={{ fontSize: '13px' }}>Additional Context</strong>
           {additionalContextSaved && <span style={{ marginLeft: '8px', color: 'green', fontSize: '12px' }}>&#10003; saved</span>}
+          {dirtyMap.additionalContext && !additionalContextSaved && <span style={{ marginLeft: '8px', color: '#ff991f', fontSize: '12px' }}>&#9679; unsaved</span>}
         </div>
         <p style={{ fontSize: '11px', color: '#666', margin: '0 0 6px' }}>
           Free-form context injected into every prompt. Use this for anything product-specific that isn't captured by the structured fields above — regulatory context, risk tolerance guidance, known edge cases, etc.
@@ -538,6 +549,7 @@ function SettingsPanel({ onBack }) {
         onDirtyChange={handleDirtyChange}
         onSave={handleSaveRiskMatrix}
         saved={riskMatrixSaved}
+        dirty={!!dirtyMap.riskMatrix}
       />
     </div>
   );
