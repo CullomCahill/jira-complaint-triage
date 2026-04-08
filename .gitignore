@@ -68,3 +68,6 @@ reference/VIDEO_WALKTHROUGH_SCRIPT.md
 
 # Python bytecode
 reference/pipeline/__pycache__/
+
+# Output of load_test.mjs
+load_test_report.json

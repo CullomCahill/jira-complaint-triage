@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Guide — SaMD Complaint Risk Assessment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .prose h2 { font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-top: 2.5rem; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e2e8f0; }
+    .prose h3 { font-size: 1rem; font-weight: 600; color: #1e293b; margin-top: 1.75rem; margin-bottom: 0.5rem; }
+    .prose p { color: #475569; font-size: 0.875rem; line-height: 1.75; margin-bottom: 0.75rem; }
+    .prose ul { color: #475569; font-size: 0.875rem; line-height: 1.75; padding-left: 1.25rem; list-style-type: disc; margin-bottom: 0.75rem; }
+    .prose ol { color: #475569; font-size: 0.875rem; line-height: 1.75; padding-left: 1.25rem; list-style-type: decimal; margin-bottom: 0.75rem; }
+    .prose li { margin-bottom: 0.25rem; }
+    .prose code { font-size: 0.8rem; background: #f1f5f9; color: #0f172a; padding: 0.1rem 0.35rem; border-radius: 0.25rem; font-family: monospace; }
+    .prose pre { background: #1e293b; color: #e2e8f0; font-size: 0.8rem; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 0.75rem; font-family: monospace; line-height: 1.6; }
+    .prose pre code { background: none; color: inherit; padding: 0; }
+    .prose strong { color: #1e293b; font-weight: 600; }
+    .prose table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-bottom: 1rem; }
+    .prose th { text-align: left; background: #f8fafc; color: #64748b; font-weight: 700; padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .prose td { padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; vertical-align: top; color: #475569; }
+    .callout-note { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 0.75rem 1rem; border-radius: 0 0.375rem 0.375rem 0; margin-bottom: 0.75rem; }
+    .callout-warn { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 0.75rem 1rem; border-radius: 0 0.375rem 0.375rem 0; margin-bottom: 0.75rem; }
+    .callout-tip  { background: #f0fdf4; border-left: 4px solid #22c55e; padding: 0.75rem 1rem; border-radius: 0 0.375rem 0.375rem 0; margin-bottom: 0.75rem; }
+    .nav-link { display: block; padding: 0.3rem 0.75rem; font-size: 0.8rem; color: #64748b; border-radius: 0.25rem; transition: all 0.1s; }
+    .nav-link:hover { background: #f1f5f9; color: #1e293b; }
+    .nav-link.active { background: #eff6ff; color: #2563eb; font-weight: 500; }
+    .nav-section { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; padding: 0.75rem 0.75rem 0.25rem; }
+  </style>
+</head>
+<body class="bg-white text-slate-800">
+
+  <!-- TOP NAV -->
+  <nav class="border-b border-slate-200 bg-white sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="index.html" class="text-sm font-medium text-slate-600 hover:text-slate-900">← Home</a>
+        <span class="text-slate-300">|</span>
+        <span class="text-sm font-semibold text-slate-900">User Guide</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="copyDocsBtn"
+          onclick="copyDocsAsText()"
+          class="text-xs font-medium border border-slate-300 text-slate-600 px-3 py-1.5 rounded-md hover:bg-slate-50 transition-colors flex items-center gap-1.5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-4 10h6a2 2 0 002-2v-8a2 2 0 00-2-2h-6a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+          Copy for LLM
+        </button>
+        <a href="https://marketplace.atlassian.com" target="_blank"
+           class="text-sm font-medium bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+          Get it free →
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-6xl mx-auto px-6 py-10 flex gap-10">
+
+    <!-- SIDEBAR NAV -->
+    <aside class="hidden lg:block w-56 shrink-0 sticky top-20 self-start">
+      <div class="nav-section">Getting started</div>
+      <a href="#quick-start" class="nav-link">Quick start</a>
+      <a href="#running-assessment" class="nav-link">Running an assessment</a>
+      <a href="#reading-results" class="nav-link">Reading results</a>
+
+      <div class="nav-section mt-2">Settings</div>
+      <a href="#api-key" class="nav-link">Anthropic API Key</a>
+      <a href="#behaviour" class="nav-link">Behaviour</a>
+      <a href="#product-info" class="nav-link">Product Info</a>
+      <a href="#additional-context" class="nav-link">Additional Context</a>
+      <a href="#user-needs" class="nav-link">User Needs</a>
+      <a href="#product-requirements" class="nav-link">Product Requirements</a>
+      <a href="#probability-scale" class="nav-link">Probability Scale</a>
+      <a href="#severity-scale" class="nav-link">Severity Scale</a>
+      <a href="#risk-matrix" class="nav-link">Risk Matrix</a>
+
+      <div class="nav-section mt-2">Reference</div>
+      <a href="#troubleshooting" class="nav-link">Troubleshooting</a>
+      <a href="#faq" class="nav-link">FAQ</a>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main id="docs-content" class="flex-1 min-w-0 prose">
+
+      <h1 class="text-3xl font-bold text-slate-900 mb-1">User Guide</h1>
+      <p class="text-slate-400 text-sm mb-8">SaMD Complaint Risk Assessment · Jira Cloud app</p>
+
+      <!-- ─── QUICK START ─── -->
+      <h2 id="quick-start">Quick start</h2>
+
+      <p>This app adds an AI-powered risk assessment panel to any Jira issue. It is designed for medical device quality teams who need a fast, consistent first-pass triage of complaints — classifying whether an issue is a product defect and scoring its probability and severity against your configured risk matrix.</p>
+
+      <h3>Prerequisites</h3>
+      <ul>
+        <li>Jira Cloud (the app does not work on Jira Server or Data Center)</li>
+        <li>An <strong>Anthropic API key</strong> — create one at <a href="https://console.anthropic.com" target="_blank" class="text-blue-600 hover:underline">console.anthropic.com</a></li>
+        <li>The app installed from the Atlassian Marketplace</li>
+      </ul>
+
+      <h3>First-time setup checklist</h3>
+      <ol>
+        <li>Install the app from the Atlassian Marketplace.</li>
+        <li>Open any Jira issue and click <strong>"View app actions"</strong> (below the issue title).</li>
+        <li>Select <strong>"SaMD Complaint Risk Assessment"</strong> to open the panel.</li>
+        <li>Click <strong>Settings</strong> (top right of the panel).</li>
+        <li>Paste your <strong>Anthropic API key</strong> and click <strong>Save API Key</strong>.</li>
+        <li>Fill in <strong>Product Info</strong> — name, type, and description of your product.</li>
+        <li>Paste your <strong>User Needs</strong> JSON array.</li>
+        <li>Paste your <strong>Product Requirements</strong> JSON array.</li>
+        <li>Click <strong>Back</strong>. You are ready to run assessments.</li>
+      </ol>
+
+      <div class="callout-note">
+        <p class="text-blue-800 text-xs font-medium mb-1">Tip</p>
+        <p class="text-blue-700 text-xs m-0">All settings persist across sessions using Atlassian Forge Storage. You only need to configure them once. They survive app redeployments.</p>
+      </div>
+
+      <!-- ─── RUNNING AN ASSESSMENT ─── -->
+      <h2 id="running-assessment">Running an assessment</h2>
+
+      <p>The panel is opened per-ticket — you choose when to run it. It is not automatic on every issue.</p>
+
+      <ol>
+        <li>Open a Jira issue you want to triage.</li>
+        <li>Click <strong>"View app actions"</strong> → <strong>"SaMD Complaint Risk Assessment"</strong>.</li>
+        <li>The panel opens showing the issue ID, title, and description.</li>
+        <li>Click <strong>Run Risk Assessment</strong>.</li>
+        <li>The button changes to <em>"Running risk assessment..."</em> and disables. Steps 2 (Probability) and 3 (Severity) run in parallel. The full pipeline typically takes <strong>10–20 seconds</strong>.</li>
+        <li>The result appears below the button.</li>
+      </ol>
+
+      <div class="callout-note">
+        <p class="text-blue-800 text-xs font-medium mb-1">What data is sent to the AI</p>
+        <p class="text-blue-700 text-xs m-0">Each time you click Run, the app fetches a fresh copy of the issue — title, description, reporter, and all comments. Previously generated risk assessment comments on the ticket are <strong>excluded</strong> from the context so they don't influence future runs.</p>
+      </div>
+
+      <!-- ─── READING RESULTS ─── -->
+      <h2 id="reading-results">Reading results</h2>
+
+      <h3>NON-DEFECT result</h3>
+      <p>If the AI determines the issue does not represent a deviation from any User Need or Product Requirement, the result shows a grey <strong>NON-DEFECT</strong> badge. No probability, severity, or risk score is shown — no further triage action is needed for this ticket.</p>
+
+      <h3>DEFECT result</h3>
+      <p>If the issue is classified as a defect, the result shows:</p>
+      <ul>
+        <li><strong>Defect classification</strong> — which User Needs and/or Product Requirements are violated (by their configured IDs)</li>
+        <li><strong>Probability score</strong> — a 1–5 score with the label from your configured scale and a rationale</li>
+        <li><strong>Severity score</strong> — a 1–5 score with the label from your configured scale and a rationale</li>
+        <li><strong>Risk level</strong> — LOW, MEDIUM, or HIGH, derived from your configured 5×5 risk matrix</li>
+        <li><strong>Disposition</strong> — the recommended action for this risk level:
+          <ul>
+            <li><strong>LOW</strong> — Complaint, moderate timeline</li>
+            <li><strong>MEDIUM</strong> — Evaluate for CAPA escalation</li>
+            <li><strong>HIGH</strong> — CAPA Required</li>
+          </ul>
+        </li>
+        <li><strong>Evidence</strong> — citations showing which specific fields or comments influenced each conclusion</li>
+      </ul>
+
+      <h3>Auto-posted comment</h3>
+      <p>If the <strong>Auto-post</strong> setting is enabled (the default), a formatted comment is posted to the Jira ticket after each run. The comment includes the risk level, disposition, probability, severity, evidence, and a timestamp. This creates an audit trail directly on the ticket.</p>
+
+      <div class="callout-warn">
+        <p class="text-amber-800 text-xs font-medium mb-1">Important</p>
+        <p class="text-amber-700 text-xs m-0">AI-generated results are a decision-support tool, not a final determination. A qualified engineer or quality manager should review and confirm the assessment before it is used in any regulated process.</p>
+      </div>
+
+      <!-- ─── SETTINGS ─── -->
+      <h2 id="settings">Settings reference</h2>
+      <p>Open Settings from the top-right button inside the panel. All fields save independently. A yellow dot (&#9679;) indicates unsaved changes in a field. A green checkmark (&#10003;) indicates the field is saved.</p>
+      <p>If you click <strong>Back</strong> with unsaved changes, you will see a warning listing which fields are dirty. You can choose to <strong>Save all changes</strong>, <strong>Leave without saving</strong>, or <strong>Keep editing</strong>.</p>
+
+      <!-- API KEY -->
+      <h3 id="api-key">Anthropic API Key</h3>
+      <p>Your Anthropic API key is required for the pipeline to run. The app cannot function without it.</p>
+      <ul>
+        <li>Paste your key (format: <code>sk-ant-...</code>) into the password field and click <strong>Save API Key</strong>.</li>
+        <li>Once saved, the key is stored in Atlassian Forge Storage. It is not displayed in plain text again.</li>
+        <li>The status shows either <strong>"&#10003; API key is saved"</strong> or <strong>"No API key saved yet."</strong></li>
+        <li>Click <strong>Remove</strong> to delete the stored key.</li>
+      </ul>
+      <div class="callout-note">
+        <p class="text-blue-800 text-xs font-medium mb-1">Where to get a key</p>
+        <p class="text-blue-700 text-xs m-0">Create an API key at <a href="https://console.anthropic.com" target="_blank" class="underline">console.anthropic.com</a>. API usage is billed to your Anthropic account — typically a few cents per assessment depending on ticket length.</p>
+      </div>
+
+      <!-- BEHAVIOUR -->
+      <h3 id="behaviour">Behaviour</h3>
+      <p>A single checkbox controls whether the completed risk assessment is automatically posted as a Jira comment after each run.</p>
+      <table>
+        <thead><tr><th>Setting</th><th>Default</th><th>Effect when enabled</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Auto-post risk assessment as a Jira comment</td>
+            <td>On</td>
+            <td>After each successful run, a formatted comment is posted to the ticket with the full result, scores, evidence, and timestamp.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>This setting saves immediately when toggled — no Save button required.</p>
+
+      <!-- PRODUCT INFO -->
+      <h3 id="product-info">Product Info</h3>
+      <p>Three short text fields that tell the AI what product it is assessing. These are injected into every prompt and directly influence how the AI contextualises defect classification and risk scoring.</p>
+      <table>
+        <thead><tr><th>Field</th><th>Placeholder / example</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Product Name</strong></td>
+            <td><code>MindBridge</code></td>
+            <td>Used in the prompt header and in the auto-posted comment summary.</td>
+          </tr>
+          <tr>
+            <td><strong>Product Type</strong></td>
+            <td><code>regulated mental health Software as Medical Device (SaMD)</code></td>
+            <td>Tells the AI the regulatory classification and product category. Affects how it frames severity and harm.</td>
+          </tr>
+          <tr>
+            <td><strong>Product Description</strong></td>
+            <td><code>a CBT-based therapeutic chatbot</code></td>
+            <td>A brief description of what the product does. Helps the AI understand the therapeutic context when evaluating patient impact.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Click <strong>Save Product Info</strong> after editing.</p>
+
+      <!-- ADDITIONAL CONTEXT -->
+      <h3 id="additional-context">Additional Context</h3>
+      <p>A free-form text field. Whatever you write here is injected verbatim into every prompt — it supplements the structured fields above and is not parsed or validated.</p>
+      <p><strong>Use this for:</strong></p>
+      <ul>
+        <li>Regulatory classification context (e.g. "This is a Class IIa device under EU MDR")</li>
+        <li>Risk tolerance guidance (e.g. "Our risk policy defaults to escalating borderline MEDIUM cases to HIGH when patient population is elderly")</li>
+        <li>Known product edge cases (e.g. "Issues related to the offline sync feature should be treated as higher severity due to data loss risk")</li>
+        <li>QMS-specific instructions (e.g. "Always flag issues involving the device's connection to external hardware as HIGH severity")</li>
+      </ul>
+      <p>Click <strong>Save Additional Context</strong> after editing.</p>
+      <div class="callout-tip">
+        <p class="text-green-800 text-xs font-medium mb-1">LLM tip</p>
+        <p class="text-green-700 text-xs m-0">This is the most flexible field in the app. If you find the AI is consistently misjudging a class of issues, add an instruction here before fine-tuning your User Needs or Product Requirements.</p>
+      </div>
+
+      <!-- USER NEEDS -->
+      <h3 id="user-needs">User Needs</h3>
+      <p>A JSON array defining the User Needs of your product. The defect classification step uses these to determine whether a complaint represents a failure of a capability the product is supposed to provide.</p>
+
+      <p><strong>Required format:</strong></p>
+      <pre><code>[
+  {
+    "id": "UN-001",
+    "description": "User shall be able to log in and access their account on all supported platforms."
+  },
+  {
+    "id": "UN-002",
+    "description": "User shall be able to save and retrieve their session progress across app sessions."
+  }
+]</code></pre>
+
+      <table>
+        <thead><tr><th>Field</th><th>Required</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>Yes</td><td>A unique identifier. Appears in the assessment output under <code>failed_user_needs</code>. Use a consistent format like <code>UN-001</code>.</td></tr>
+          <tr><td><code>description</code></td><td>Yes</td><td>A clear statement of what the user should be able to do. Write these as "shall" statements.</td></tr>
+        </tbody>
+      </table>
+
+      <p>Click <strong>Save</strong> after editing. The field validates that the input is valid JSON before saving — if you see <em>"Invalid JSON — check your formatting"</em>, use a JSON validator to find the syntax error.</p>
+
+      <div class="callout-warn">
+        <p class="text-amber-800 text-xs font-medium mb-1">This field is required</p>
+        <p class="text-amber-700 text-xs m-0">If User Needs are not configured, the pipeline will return an error: <em>"Product context not configured. Please add user needs and product requirements in Settings."</em></p>
+      </div>
+
+      <!-- PRODUCT REQUIREMENTS -->
+      <h3 id="product-requirements">Product Requirements</h3>
+      <p>A JSON array defining the Product Requirements (design outputs) of your product. The defect classification step checks whether the complaint indicates a failure to meet a specific requirement. The <code>traces_to</code> field links each requirement back to the User Need it satisfies.</p>
+
+      <p><strong>Required format:</strong></p>
+      <pre><code>[
+  {
+    "id": "PR-001",
+    "description": "The system shall support login on iOS 15 and above.",
+    "traces_to": "UN-001"
+  },
+  {
+    "id": "PR-002",
+    "description": "The system shall persist session data and restore it on next launch without data loss.",
+    "traces_to": "UN-002"
+  }
+]</code></pre>
+
+      <table>
+        <thead><tr><th>Field</th><th>Required</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>Yes</td><td>Unique identifier. Appears in assessment output under <code>failed_requirements</code>. Use a consistent format like <code>PR-001</code>.</td></tr>
+          <tr><td><code>description</code></td><td>Yes</td><td>The specific, testable requirement. Write as "shall" statements.</td></tr>
+          <tr><td><code>traces_to</code></td><td>Recommended</td><td>The <code>id</code> of the User Need this requirement satisfies. Used to build the traceability chain for the AI. Should match a value from your User Needs list.</td></tr>
+        </tbody>
+      </table>
+
+      <p>Click <strong>Save</strong> after editing.</p>
+      <div class="callout-tip">
+        <p class="text-green-800 text-xs font-medium mb-1">Tip — granularity matters</p>
+        <p class="text-green-700 text-xs m-0">The more specific and testable your requirements, the more precise the defect classification. Vague requirements like "the product shall be reliable" produce vague results. Requirement statements scoped to specific features or behaviours perform much better.</p>
+      </div>
+
+      <!-- PROBABILITY SCALE -->
+      <h3 id="probability-scale">Probability Scale</h3>
+      <p>Defines what each probability score (1–5) means in the context of your product. The AI uses these definitions when scoring how likely users are to encounter a defect during normal use.</p>
+      <p>Each level has two editable fields: a short <strong>Label</strong> and a longer <strong>Description</strong>. Level 1 is the lowest probability; Level 5 is the highest.</p>
+
+      <p><strong>Default scale:</strong></p>
+      <table>
+        <thead><tr><th>Level</th><th>Default label</th><th>Default description</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Remote</td><td>unlikely to occur</td></tr>
+          <tr><td>2</td><td>Low</td><td>could occur but rare</td></tr>
+          <tr><td>3</td><td>Moderate</td><td>may occur occasionally</td></tr>
+          <tr><td>4</td><td>High</td><td>likely to occur</td></tr>
+          <tr><td>5</td><td>Very High</td><td>almost certain to occur</td></tr>
+        </tbody>
+      </table>
+
+      <p>Edit the label and description for any level, then click <strong>Save Probability Scale</strong>.</p>
+
+      <!-- SEVERITY SCALE -->
+      <h3 id="severity-scale">Severity Scale</h3>
+      <p>Defines what each severity score (1–5) means in the context of your product. The AI uses these definitions when assessing the potential harm to a patient or user if the defect occurs.</p>
+      <p>Each level has a <strong>Label</strong> and a <strong>Description</strong>. Level 1 is the least severe; Level 5 is the most severe.</p>
+
+      <p><strong>Default scale:</strong></p>
+      <table>
+        <thead><tr><th>Level</th><th>Default label</th><th>Default description</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Negligible</td><td>no impact on therapeutic experience</td></tr>
+          <tr><td>2</td><td>Minor</td><td>slight inconvenience, user can continue</td></tr>
+          <tr><td>3</td><td>Moderate</td><td>disrupts session but user can recover</td></tr>
+          <tr><td>4</td><td>Major</td><td>prevents therapeutic function or causes distress</td></tr>
+          <tr><td>5</td><td>Critical</td><td>potential for clinical harm or safety event</td></tr>
+        </tbody>
+      </table>
+
+      <p>Edit the label and description for any level, then click <strong>Save Severity Scale</strong>.</p>
+      <div class="callout-tip">
+        <p class="text-green-800 text-xs font-medium mb-1">Tip — tailor these to your product</p>
+        <p class="text-green-700 text-xs m-0">The default scales are written for a therapeutic SaMD. If your product is a diagnostic tool, a surgical planning aid, or a different device category, rewrite the severity descriptions to reflect harm pathways relevant to your specific intended use.</p>
+      </div>
+
+      <!-- RISK MATRIX -->
+      <h3 id="risk-matrix">Risk Matrix</h3>
+      <p>A 5×5 interactive grid that maps every combination of Severity (rows) and Probability (columns) to a risk level: <strong>LOW</strong>, <strong>MEDIUM</strong>, or <strong>HIGH</strong>.</p>
+
+      <p><strong>How to read and edit the matrix:</strong></p>
+      <ul>
+        <li>Rows represent Severity levels — Severity 5 is at the top, Severity 1 at the bottom.</li>
+        <li>Columns represent Probability levels — Probability 1 is on the left, Probability 5 on the right.</li>
+        <li>Each cell shows the current risk level for that S×P combination.</li>
+        <li><strong>Click any cell to cycle it through LOW → MEDIUM → HIGH → LOW.</strong></li>
+        <li>The row and column labels reflect your configured Probability and Severity scale labels.</li>
+        <li>Click <strong>Save Risk Matrix</strong> to persist your changes.</li>
+        <li>Click <strong>Reset to ISO Default</strong> to restore the default matrix (see below).</li>
+      </ul>
+
+      <p><strong>Default (ISO 14971-aligned) risk matrix:</strong></p>
+      <table>
+        <thead>
+          <tr>
+            <th>Severity ↓ / Probability →</th>
+            <th>P1 Remote</th><th>P2 Low</th><th>P3 Moderate</th><th>P4 High</th><th>P5 Very High</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>S5 Critical</strong></td><td class="text-red-600 font-semibold">HIGH</td><td class="text-red-600 font-semibold">HIGH</td><td class="text-red-600 font-semibold">HIGH</td><td class="text-red-600 font-semibold">HIGH</td><td class="text-red-600 font-semibold">HIGH</td></tr>
+          <tr><td><strong>S4 Major</strong></td><td class="text-amber-600 font-semibold">MEDIUM</td><td class="text-red-600 font-semibold">HIGH</td><td class="text-red-600 font-semibold">HIGH</td><td class="text-red-600 font-semibold">HIGH</td><td class="text-red-600 font-semibold">HIGH</td></tr>
+          <tr><td><strong>S3 Moderate</strong></td><td class="text-green-600 font-semibold">LOW</td><td class="text-amber-600 font-semibold">MEDIUM</td><td class="text-amber-600 font-semibold">MEDIUM</td><td class="text-red-600 font-semibold">HIGH</td><td class="text-red-600 font-semibold">HIGH</td></tr>
+          <tr><td><strong>S2 Minor</strong></td><td class="text-green-600 font-semibold">LOW</td><td class="text-green-600 font-semibold">LOW</td><td class="text-amber-600 font-semibold">MEDIUM</td><td class="text-amber-600 font-semibold">MEDIUM</td><td class="text-red-600 font-semibold">HIGH</td></tr>
+          <tr><td><strong>S1 Negligible</strong></td><td class="text-green-600 font-semibold">LOW</td><td class="text-green-600 font-semibold">LOW</td><td class="text-green-600 font-semibold">LOW</td><td class="text-green-600 font-semibold">LOW</td><td class="text-green-600 font-semibold">LOW</td></tr>
+        </tbody>
+      </table>
+
+      <!-- ─── TROUBLESHOOTING ─── -->
+      <h2 id="troubleshooting">Troubleshooting</h2>
+
+      <h3>"Product context not configured" error</h3>
+      <p>The pipeline requires both <strong>User Needs</strong> and <strong>Product Requirements</strong> to be saved before it can run. Open Settings and paste valid JSON arrays into both fields, then click Save on each.</p>
+
+      <h3>"No API key saved" error</h3>
+      <p>Open Settings, paste your Anthropic API key into the API Key field, and click <strong>Save API Key</strong>. The key status indicator at the top of the field should show a green checkmark after saving.</p>
+
+      <h3>"Invalid JSON — check your formatting" when saving User Needs or Product Requirements</h3>
+      <p>The field requires valid JSON. Common issues:</p>
+      <ul>
+        <li>Missing commas between objects in the array</li>
+        <li>Trailing comma after the last object (not valid in standard JSON)</li>
+        <li>Single quotes instead of double quotes</li>
+        <li>Missing closing bracket <code>]</code></li>
+      </ul>
+      <p>Paste your JSON into <a href="https://jsonlint.com" target="_blank" class="text-blue-600 hover:underline">jsonlint.com</a> to identify the exact error.</p>
+
+      <h3>Assessment takes longer than 30 seconds or times out</h3>
+      <p>The pipeline makes three sequential (or partially parallel) API calls to Anthropic. Slowness is usually caused by Anthropic API latency under load. Try running again. If timeouts persist, check your API key usage limits in the Anthropic console.</p>
+
+      <h3>Auto-posted comment does not appear on the ticket</h3>
+      <p>Confirm that <strong>Auto-post risk assessment as a Jira comment</strong> is checked in Settings. Also confirm the app has <code>write:jira-work</code> permission — this is included in the standard installation. If you installed the app before this permission was added, run <code>forge install --upgrade</code> from your terminal.</p>
+
+      <h3>Settings I saved are gone after redeployment</h3>
+      <p>Settings are stored in Atlassian Forge Storage, not in the app bundle. They persist across deploys. If settings appear to be missing, check whether you are on the same Jira site (settings are scoped to the site the app is installed on).</p>
+
+      <!-- ─── FAQ ─── -->
+      <h2 id="faq">FAQ</h2>
+
+      <h3>Does the app work on Jira Server or Data Center?</h3>
+      <p>No. The app is built on Atlassian Forge, which only supports Jira Cloud.</p>
+
+      <h3>Is my issue data stored anywhere?</h3>
+      <p>No. Issue content (title, description, comments) is sent to Anthropic's API for processing and is not stored by this app after the API call completes. See the <a href="privacy.html" class="text-blue-600 hover:underline">Privacy Policy</a> for full details.</p>
+
+      <h3>How much does it cost to run an assessment?</h3>
+      <p>The app itself is free. You pay Anthropic for API usage. A typical assessment (three API calls for a moderately detailed ticket) uses roughly 2,000–5,000 tokens total, which is a fraction of a cent at current Claude pricing. Check <a href="https://www.anthropic.com/pricing" target="_blank" class="text-blue-600 hover:underline">anthropic.com/pricing</a> for current rates.</p>
+
+      <h3>Can I run multiple assessments on the same ticket?</h3>
+      <p>Yes. Each click of Run Risk Assessment is independent — it fetches fresh issue data and runs a new pipeline. If auto-post is on, each run adds a new comment to the ticket. Previously posted comments are excluded from the AI context to avoid circular reasoning.</p>
+
+      <h3>Can I use this for non-SaMD products?</h3>
+      <p>Yes. The assessment framework is configurable. Replace the User Needs, Product Requirements, probability scale, severity scale, and risk matrix with values appropriate to your product type. The default severity scale is written for therapeutic SaMD — you should replace it if your product has different harm pathways.</p>
+
+      <h3>The AI consistently over- or under-scores a type of issue. How do I fix it?</h3>
+      <p>Try the following in order:</p>
+      <ol>
+        <li>Add a specific instruction in <strong>Additional Context</strong> (e.g. "Login-related issues should always score at least Probability 3 due to daily user exposure").</li>
+        <li>Make the relevant Product Requirement more specific.</li>
+        <li>Adjust the severity or probability scale descriptions to better reflect your product's risk profile.</li>
+        <li>Adjust the risk matrix thresholds directly.</li>
+      </ol>
+
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-200 bg-white mt-10">
+    <div class="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <p class="text-slate-400 text-xs">SaMD Complaint Risk Assessment · Cahill Consulting Group LLC</p>
+      <div class="flex items-center gap-5 text-xs text-slate-400">
+        <a href="index.html" class="hover:text-slate-600">Home</a>
+        <a href="privacy.html" class="hover:text-slate-600">Privacy Policy</a>
+        <a href="terms.html" class="hover:text-slate-600">Terms of Service</a>
+        <a href="mailto:cullom@cahillconsultinggroup.com" class="hover:text-slate-600">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ── Copy docs as plain text for pasting into an LLM ──
+    function copyDocsAsText() {
+      const content = document.getElementById('docs-content');
+
+      // Walk the DOM and extract structured plain text
+      const lines = [];
+      function walk(node, depth) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          const t = node.textContent.trim();
+          if (t) lines.push(t);
+          return;
+        }
+        if (node.nodeType !== Node.ELEMENT_NODE) return;
+        const tag = node.tagName.toLowerCase();
+
+        if (tag === 'h1') { lines.push('\n# ' + node.textContent.trim()); return; }
+        if (tag === 'h2') { lines.push('\n## ' + node.textContent.trim()); return; }
+        if (tag === 'h3') { lines.push('\n### ' + node.textContent.trim()); return; }
+        if (tag === 'pre') { lines.push('\n```\n' + node.textContent.trim() + '\n```'); return; }
+        if (tag === 'li') { lines.push('- ' + node.textContent.trim()); return; }
+        if (tag === 'tr') {
+          const cells = Array.from(node.querySelectorAll('th, td')).map(c => c.textContent.trim());
+          lines.push(cells.join(' | '));
+          return;
+        }
+        if (['script', 'style', 'button'].includes(tag)) return;
+
+        for (const child of node.childNodes) walk(child, depth + 1);
+
+        if (['p', 'div', 'ul', 'ol', 'table', 'thead', 'tbody'].includes(tag)) lines.push('');
+      }
+
+      walk(content, 0);
+
+      const text = lines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyDocsBtn');
+        btn.textContent = '✓ Copied!';
+        btn.classList.add('bg-green-50', 'border-green-300', 'text-green-700');
+        setTimeout(() => {
+          btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-4 10h6a2 2 0 002-2v-8a2 2 0 00-2-2h-6a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>Copy for LLM`;
+          btn.classList.remove('bg-green-50', 'border-green-300', 'text-green-700');
+        }, 2000);
+      });
+    }
+
+    // ── Highlight active nav link on scroll ──
+    const sections = document.querySelectorAll('h2[id], h3[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          navLinks.forEach(l => l.classList.remove('active'));
+          const active = document.querySelector(`.nav-link[href="#${e.target.id}"]`);
+          if (active) active.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-10% 0px -80% 0px' });
+    sections.forEach(s => observer.observe(s));
+  </script>
+
+</body>
+</html>
