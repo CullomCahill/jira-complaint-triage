@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { invoke } from '@forge/bridge';
 
 const textareaStyle = {
@@ -11,10 +11,11 @@ const textareaStyle = {
   marginBottom: '6px',
 };
 
-function ConfigSection({ label, hint, storageKey, saveResolver, onDirtyChange }) {
+function ConfigSection({ label, hint, storageKey, saveResolver, onDirtyChange, registerSave }) {
   const [text, setText] = useState('');
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
+  const handleSaveRef = useRef(null);
 
   useEffect(() => {
     invoke('getProductContext').then((ctx) => {
@@ -25,6 +26,10 @@ function ConfigSection({ label, hint, storageKey, saveResolver, onDirtyChange })
       }
     });
   }, [storageKey]);
+
+  useEffect(() => {
+    if (registerSave) registerSave(storageKey, () => handleSaveRef.current?.());
+  }, [storageKey, registerSave]);
 
   const handleChange = (e) => {
     setText(e.target.value);
@@ -45,6 +50,8 @@ function ConfigSection({ label, hint, storageKey, saveResolver, onDirtyChange })
     setSaved(true);
     onDirtyChange(storageKey, false);
   };
+
+  handleSaveRef.current = handleSave;
 
   return (
     <div style={{ marginBottom: '20px' }}>
@@ -190,11 +197,16 @@ function RiskMatrixEditor({ matrix, probabilityScale, severityScale, onMatrixCha
   );
 }
 
-function ScaleEditor({ label, hint, scaleKey, saveResolver, initialScale, onDirtyChange }) {
+function ScaleEditor({ label, hint, scaleKey, saveResolver, initialScale, onDirtyChange, registerSave }) {
   const [scale, setScale] = useState(initialScale);
   const [saved, setSaved] = useState(false);
+  const handleSaveRef = useRef(null);
 
   useEffect(() => { setScale(initialScale); }, [initialScale]);
+
+  useEffect(() => {
+    if (registerSave) registerSave(scaleKey, () => handleSaveRef.current?.());
+  }, [scaleKey, registerSave]);
 
   const handleChange = (index, field, value) => {
     setScale(prev => prev.map((item, i) => i === index ? { ...item, [field]: value } : item));
@@ -207,6 +219,8 @@ function ScaleEditor({ label, hint, scaleKey, saveResolver, initialScale, onDirt
     setSaved(true);
     onDirtyChange(scaleKey, false);
   };
+
+  handleSaveRef.current = handleSave;
 
   return (
     <div style={{ marginBottom: '20px' }}>
@@ -268,7 +282,22 @@ function SettingsPanel({ onBack }) {
   const [riskMatrix, setRiskMatrix] = useState(DEFAULT_RISK_MATRIX);
   const [riskMatrixSaved, setRiskMatrixSaved] = useState(false);
 
-  const isDirty = Object.values(dirtyMap).some(Boolean) || inputValue.trim().length > 0 || dirtyMap['productInfo'];
+  const FIELD_LABELS = {
+    userNeeds: 'User Needs',
+    productRequirements: 'Product Requirements',
+    riskMatrix: 'Risk Matrix',
+    productInfo: 'Product Info',
+    additionalContext: 'Additional Context',
+    probabilityScale: 'Probability Scale',
+    severityScale: 'Severity Scale',
+  };
+
+  const dirtyFields = [
+    ...Object.entries(dirtyMap).filter(([, v]) => v).map(([k]) => FIELD_LABELS[k] || k),
+    ...(inputValue.trim().length > 0 ? ['API Key'] : []),
+  ];
+
+  const isDirty = dirtyFields.length > 0;
 
   useEffect(() => {
     invoke('getApiKeyStatus').then(({ exists }) => setKeyExists(exists));
@@ -333,6 +362,24 @@ function SettingsPanel({ onBack }) {
     setKeyStatus('API key removed.');
   };
 
+  const saveHandlersRef = useRef({});
+  const registerSaveHandler = useCallback((key, fn) => {
+    saveHandlersRef.current[key] = fn;
+  }, []);
+
+  const handleSaveAll = async () => {
+    const tasks = [];
+    if (dirtyMap.productInfo) tasks.push(handleSaveProductInfo());
+    if (dirtyMap.additionalContext) tasks.push(handleSaveAdditionalContext());
+    if (dirtyMap.riskMatrix) tasks.push(handleSaveRiskMatrix());
+    if (inputValue.trim()) tasks.push(handleSaveKey());
+    for (const [key, fn] of Object.entries(saveHandlersRef.current)) {
+      if (dirtyMap[key]) tasks.push(fn());
+    }
+    await Promise.all(tasks);
+    onBack();
+  };
+
   const handleBack = () => {
     if (isDirty) { setConfirmingBack(true); } else { onBack(); }
   };
@@ -348,10 +395,11 @@ function SettingsPanel({ onBack }) {
 
       {confirmingBack && (
         <div style={{ marginBottom: '16px', padding: '10px 12px', background: '#fffae6', border: '1px solid #ffab00', borderRadius: '4px', fontSize: '12px' }}>
-          <strong>You have unsaved changes.</strong> Go back anyway?
+          <strong>Unsaved changes in: </strong>{dirtyFields.join(', ')}
           <div style={{ marginTop: '8px', display: 'flex', gap: '8px' }}>
             <button onClick={onBack}>Leave without saving</button>
-            <button onClick={() => setConfirmingBack(false)}>Stay</button>
+            <button onClick={() => setConfirmingBack(false)}>Keep editing</button>
+            <button onClick={handleSaveAll} style={{ fontWeight: 600 }}>Save all changes</button>
           </div>
         </div>
       )}
@@ -446,6 +494,7 @@ function SettingsPanel({ onBack }) {
         storageKey="userNeeds"
         saveResolver="saveUserNeeds"
         onDirtyChange={handleDirtyChange}
+        registerSave={registerSaveHandler}
       />
 
       <ConfigSection
@@ -454,6 +503,7 @@ function SettingsPanel({ onBack }) {
         storageKey="productRequirements"
         saveResolver="saveProductRequirements"
         onDirtyChange={handleDirtyChange}
+        registerSave={registerSaveHandler}
       />
 
       <hr style={{ margin: '0 0 16px' }} />
@@ -465,6 +515,7 @@ function SettingsPanel({ onBack }) {
         saveResolver="saveProbabilityScale"
         initialScale={probabilityScale}
         onDirtyChange={handleDirtyChange}
+        registerSave={registerSaveHandler}
       />
 
       <ScaleEditor
@@ -474,6 +525,7 @@ function SettingsPanel({ onBack }) {
         saveResolver="saveSeverityScale"
         initialScale={severityScale}
         onDirtyChange={handleDirtyChange}
+        registerSave={registerSaveHandler}
       />
 
       <hr style={{ margin: '0 0 16px' }} />

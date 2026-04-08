@@ -78,10 +78,10 @@ All manual tests require: app deployed (`npm run deploy`), installed on a Jira s
 
 | # | Steps | Expected |
 |---|-------|----------|
-| M4 | Open any Jira issue | Panel titled "SaMD Complaint Risk Assessment" appears in right sidebar |
+| M4 | Open any Jira issue → click "View app actions" below the issue title → click "SaMD Complaint Risk Assessment" | Panel opens and loads correctly |
 | M5 | Check the run button label | Reads "Run Risk Assessment" |
 | M6 | Click Run Risk Assessment | Button reads "Running risk assessment..." and is disabled while running |
-| M7 | After module key rename: run `forge install --upgrade`, redeploy, open Jira | Panel still loads correctly |
+| M7 | After module key rename: run `forge install --upgrade`, redeploy, open Jira | Panel still opens correctly via "View app actions" |
 
 ---
 
@@ -93,9 +93,9 @@ All manual tests require: app deployed (`npm run deploy`), installed on a Jira s
 | M9 | Open Settings, paste product requirements, click Save | Same |
 | M10 | Open Settings, enter API key, click Save | "Key saved" indicator shown, key not displayed in plain text |
 | M11 | Clear the API key, save | "No key saved" state shown |
-| M12 | Edit probability scale options, save, run triage | Output uses updated scale labels |
-| M13 | Edit severity scale options, save, run triage | Output uses updated scale labels |
-| M14 | Edit 5×5 risk matrix values, save, run triage | Risk score reflects updated matrix thresholds |
+| M12 | Edit probability scale options, save, run triage | Output uses updated scale labels — **do once manually to confirm UI→storage wiring; ongoing correctness covered by load testing with varied configs** |
+| M13 | Edit severity scale options, save, run triage | Same as M12 |
+| M14 | Edit 5×5 risk matrix values, save, run triage | Risk score reflects updated matrix — **do once manually; matrix lookup logic is fully covered by `riskMatrix.test.js`** |
 | M15 | Edit the free-form additional context field, save, run triage | LLM response reflects added context |
 | M16 | Open Settings, edit any textarea, click Back without saving | Yellow "unsaved changes" warning appears |
 | M17 | Warning appears → click "Stay" | Remains on Settings page, edits preserved |
