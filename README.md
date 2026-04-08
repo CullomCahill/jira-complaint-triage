@@ -1,6 +1,6 @@
-# Jira Complaint Triage — Forge App
+# SaMD Complaint Risk Assessment — Forge App
 
-AI-powered bug triage pipeline for regulated SaMD environments, built on Atlassian Forge.
+AI-powered complaint risk triage for medical device quality teams, built on Atlassian Forge.
 
 ---
 
