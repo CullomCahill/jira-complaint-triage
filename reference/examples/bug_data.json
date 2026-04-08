@@ -109,7 +109,7 @@
         "related_feature": "CBT thought challenging module",
         "expected_classification": "Complaint",
         "expected_probability": 4,
-        "expected_severity": 3,
+        "expected_severity": 2,
         "notes": "Boundary violation in a therapeutic context. When a user explicitly ends a session, the product should respect that boundary. For mental health users, feeling like the app is pursuing them can be distressing and undermine therapeutic trust."
       },
       {
@@ -122,7 +122,7 @@
         "in_released_product": true,
         "related_feature": "Crisis detection and escalation",
         "expected_classification": "Complaint",
-        "expected_probability": 3,
+        "expected_probability": 2,
         "expected_severity": 3,
         "notes": "False positive in crisis detection. While erring on the side of caution is appropriate, repeated false positives can erode user trust and cause users to avoid discussing certain topics or disengage from the product entirely."
       },

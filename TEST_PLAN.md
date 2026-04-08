@@ -52,9 +52,9 @@ These call the Anthropic API so tests require mocking the client.
 
 | # | Test | Status |
 |---|------|--------|
-| A29 | Mock returns malformed JSON — verify graceful error, not a crash | ⬜ not implemented |
-| A30 | Mock returns valid classification — verify output shape matches schema | ⬜ not implemented |
-| A31 | Empty bug description — verify prompt runs without throwing | ⬜ not implemented |
+| A29 | Mock returns malformed JSON — verify graceful error, not a crash | ✅ |
+| A30 | Mock returns valid classification — verify output shape matches schema | ✅ |
+| A31 | Empty bug description — verify prompt runs without throwing | ✅ |
 
 ---
 
@@ -74,52 +74,54 @@ All manual tests require: app deployed (`npm run deploy`), installed on a Jira s
 
 ---
 
+Results: ✅ |  ❌ |
+
 ### 2. App appearance and UI labels
 
-| # | Steps | Expected |
-|---|-------|----------|
-| M4 | Open any Jira issue → click "View app actions" below the issue title → click "SaMD Complaint Risk Assessment" | Panel opens and loads correctly |
-| M5 | Check the run button label | Reads "Run Risk Assessment" |
-| M6 | Click Run Risk Assessment | Button reads "Running risk assessment..." and is disabled while running |
-| M7 | After module key rename: run `forge install --upgrade`, redeploy, open Jira | Panel still opens correctly via "View app actions" |
+| # | Steps | Expected | Result |
+|---|-------|----------|--------|
+| M4 | Open any Jira issue | ability to add SaMD Complaint triage window under "app actions" | ✅ | 
+| M5 | Check the run button label | Reads "Run Risk Assessment" | ✅ |
+| M6 | Click Run Risk Assessment | Button reads "Running risk assessment..." and is disabled while running | ✅ |
+| M7 | After module key rename: run `forge install --upgrade`, redeploy, open Jira | Panel still loads correctly | ✅ |
 
 ---
-
+🟠
 ### 3. Settings panel
 
-| # | Steps | Expected |
-|---|-------|----------|
-| M8 | Open Settings, paste user needs, click Save | Checkmark appears, value persists after page refresh |
-| M9 | Open Settings, paste product requirements, click Save | Same |
-| M10 | Open Settings, enter API key, click Save | "Key saved" indicator shown, key not displayed in plain text |
-| M11 | Clear the API key, save | "No key saved" state shown |
-| M12 | Edit probability scale options, save, run triage | Output uses updated scale labels — **do once manually to confirm UI→storage wiring; ongoing correctness covered by load testing with varied configs** |
-| M13 | Edit severity scale options, save, run triage | Same as M12 |
-| M14 | Edit 5×5 risk matrix values, save, run triage | Risk score reflects updated matrix — **do once manually; matrix lookup logic is fully covered by `riskMatrix.test.js`** |
-| M15 | Edit the free-form additional context field, save, run triage | LLM response reflects added context |
-| M16 | Open Settings, edit any textarea, click Back without saving | Yellow "unsaved changes" warning appears |
+| # | Steps | Expected | Result |
+|---|-------|----------|--------|
+| M8 | Open Settings, paste user needs, click Save | Checkmark appears, value persists after page refresh |   ✅ |
+| M9 | Open Settings, paste product requirements, click Save | ✅ |
+| M10 | Open Settings, enter API key, click Save | "Key saved" indicator shown, key not displayed in plain text | ✅ |
+| M11 | Clear the API key, save | "No key saved" state shown | ✅  - error shown: There was an error invoking the function - No API key saved. Please configure your Anthropic API key in settings. | 
+| M12 | Edit probability scale options, save, run triage | Output uses updated scale labels | ✅ |
+| M13 | Edit severity scale options, save, run triage | Output uses updated scale labels | 🟠 UI tested, but did not do a deep dive in if its working in the actual output |
+| M14 | Edit 5×5 risk matrix values, save, run triage | Risk score reflects updated matrix thresholds | 🟠 UI tested, but did not do a deep dive in if its working in the actual output |
+| M15 | Edit the free-form additional context field, save, run triage | LLM response reflects added context |  ✅ |
+| M16 | Open Settings, edit any textarea, click Back without saving | Yellow "unsaved changes" warning appears | ✅ |
 | M17 | Warning appears → click "Stay" | Remains on Settings page, edits preserved |
-| M18 | Warning appears → click "Leave without saving" | Returns to main panel, changes discarded |
-| M19 | Open Settings, edit and click Save, then click Back | No warning — dirty flag cleared after save |
+| M18 | Warning appears → click "Leave without saving" | Returns to main panel, changes discarded | ✅ |
+| M19 | Open Settings, edit a window and click Save, then click Back | No warning — dirty flag cleared after save |  ✅ |
 
 ---
 
 ### 4. Triage pipeline — defect classification
 
-| # | Ticket setup | Expected |
-|---|--------------|----------|
-| M20 | Ticket describing a clear software bug | Classified as DEFECT |
-| M21 | Ticket describing a user request or feature ask | Classified as NON-DEFECT, no risk score shown |
-| M22 | NON-DEFECT result | Grey badge, no probability/severity rows |
-| M23 | Run with no API key saved | Red error card with clear message pointing to Settings |
-| M24 | Run with API key but no product requirements saved | Red error card pointing to Settings |
+| # | Steps | Expected | Result |
+|---|-------|----------|--------|
+| M20 | Ticket describing a clear software bug | Classified as DEFECT |  ✅ |
+| M21 | Ticket describing a user request or feature ask | Classified as NON-DEFECT, no risk score shown |  ✅ |
+| M22 | NON-DEFECT result | Grey badge, no probability/severity rows |  ✅ |
+| M23 | Run with no API key saved | Red error card with clear message pointing to Settings |  ✅ |
+| M24 | Run with API key but no product requirements saved | Red error card pointing to Settings | ✅ error: There was an error invoking the function - Product context not configured. Please add user needs and product requirements in Settings. |
 
 ---
 
 ### 5. Triage pipeline — probability and severity scoring
 
-| # | Ticket setup | Expected |
-|---|--------------|----------|
+| # | Steps | Expected | Result |
+|---|-------|----------|--------|
 | M25 | Well-documented bug with high patient impact | Probability and severity both score high (4–5) |
 | M26 | Minor cosmetic bug with no patient-facing impact | Low scores (1–2) |
 | M27 | Ambiguous ticket | Mid-range scores, rationale explains uncertainty |
@@ -128,11 +130,11 @@ All manual tests require: app deployed (`npm run deploy`), installed on a Jira s
 
 ### 6. Risk result display
 
-| # | Steps | Expected |
-|---|-------|----------|
-| M28 | HIGH risk result (score 15–25) | Large red badge, red score pills on probability and severity rows |
-| M29 | MEDIUM risk result (score 7–14) | Orange badge, appropriate pill colors |
-| M30 | LOW risk result (score 1–6) | Green badge |
+| # | Steps | Expected | Result |
+|---|-------|----------|--------|
+| M28 | HIGH risk result | Large red badge, red score pills on probability and severity rows |
+| M29 | MEDIUM risk result | Orange badge, appropriate pill colors |
+| M30 | LOW risk result | Green badge |
 | M31 | NON-DEFECT result | Grey badge, no score rows |
 | M32 | Evidence section present | Individual bordered cards with step badge and indented quote |
 
@@ -140,8 +142,8 @@ All manual tests require: app deployed (`npm run deploy`), installed on a Jira s
 
 ### 7. Comments as context
 
-| # | Ticket setup | Expected |
-|---|--------------|----------|
+| # | Steps | Expected | Result |
+|---|-------|----------|--------|
 | M33 | Ticket with one relevant comment, run assessment | Output references the comment in Evidence if relevant |
 | M34 | Add a comment saying the issue only occurs in development, run assessment | Classified as NON-DEFECT, Evidence cites the comment |
 | M35 | Add a new comment after panel loads, click Run without refreshing | New comment is included (fresh fetch on each run) |
@@ -151,8 +153,8 @@ All manual tests require: app deployed (`npm run deploy`), installed on a Jira s
 
 ### 8. Auto-post comment
 
-| # | Steps | Expected |
-|---|-------|----------|
+| # | Steps | Expected | Result |
+|---|-------|----------|--------|
 | M37 | Run assessment with auto-post enabled | After 10–20 seconds a formatted comment appears on the ticket |
 | M38 | Comment content | Shows risk level, disposition, probability, severity, evidence (if any), generated timestamp |
 | M39 | Go to Settings → disable "Auto-post risk assessment as Jira comment" → run | No comment posted |
@@ -162,8 +164,8 @@ All manual tests require: app deployed (`npm run deploy`), installed on a Jira s
 
 ### 9. Product info / prompt variables
 
-| # | Steps | Expected |
-|---|-------|----------|
+| # | Steps | Expected | Result |
+|---|-------|----------|--------|
 | M41 | Go to Settings → verify Product Name, Product Type, Product Description fields exist | Fields present and pre-populated |
 | M42 | Update Product Name, save, run assessment | New name appears in output summary |
 | M43 | Edit Product Info, click Back without saving | Unsaved changes warning appears |
@@ -172,8 +174,8 @@ All manual tests require: app deployed (`npm run deploy`), installed on a Jira s
 
 ### 10. Session persistence
 
-| # | Steps | Expected |
-|---|-------|----------|
+| # | Steps | Expected | Result |
+|---|-------|----------|--------|
 | M44 | Save API key, close browser, reopen Jira | Key still saved ("Key saved" indicator shown) |
 | M45 | Save all settings, redeploy app, reopen Jira | All settings persist across deploys |
 
