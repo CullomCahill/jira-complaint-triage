@@ -48,7 +48,7 @@ Respond in the following JSON format only, no other text:
     "failed_requirements": ["PR-XXX", "PR-YYY"] or [],
     "failed_user_needs": ["UN-XXX"] or [],
     "rationale": "one to two sentences explaining which requirements or user needs are failed and why, or why none are failed",
-    "summary": "two to three sentence summary of the overall finding suitable for presentation at a Complaint Review Board meeting",
+    "summary": "two to three sentence factual summary of what the ticket describes, written as an extracted observation (use phrases like 'the ticket indicates', 'this appears to', 'if confirmed') rather than a concluded finding",
     "references": [{ "source": "Comment by [author] [date]", "quote": "relevant excerpt that influenced this conclusion" }]
 }
 

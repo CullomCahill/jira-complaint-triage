@@ -126,7 +126,7 @@
         <li>Click <strong>"View app actions"</strong> → <strong>"SaMD Complaint Risk Assessment"</strong>.</li>
         <li>The panel opens showing the issue ID, title, and description.</li>
         <li>Click <strong>Run Risk Assessment</strong>.</li>
-        <li>The button changes to <em>"Running risk assessment..."</em> and disables. Steps 2 (Probability) and 3 (Severity) run in parallel. The full pipeline typically takes <strong>10–20 seconds</strong>.</li>
+        <li>The button changes to <em>"Running risk assessment..."</em> and disables. Steps 2 (Probability) and 3 (Severity) run in parallel. The full pipeline runtime depends on size of context window.</li>
         <li>The result appears below the button.</li>
       </ol>
 
@@ -417,7 +417,7 @@
       <p>No. Issue content (title, description, comments) is sent to Anthropic's API for processing and is not stored by this app after the API call completes. See the <a href="privacy.html" class="text-blue-600 hover:underline">Privacy Policy</a> for full details.</p>
 
       <h3>How much does it cost to run an assessment?</h3>
-      <p>The app itself is free. You pay Anthropic for API usage. A typical assessment (three API calls for a moderately detailed ticket) uses roughly 2,000–5,000 tokens total, which is a fraction of a cent at current Claude pricing. Check <a href="https://www.anthropic.com/pricing" target="_blank" class="text-blue-600 hover:underline">anthropic.com/pricing</a> for current rates.</p>
+      <p>The app itself is free. You pay Anthropic for API usage. Assessment will be based on size of context window. Check <a href="https://www.anthropic.com/pricing" target="_blank" class="text-blue-600 hover:underline">anthropic.com/pricing</a> for current rates.</p>
 
       <h3>Can I run multiple assessments on the same ticket?</h3>
       <p>Yes. Each click of Run Risk Assessment is independent — it fetches fresh issue data and runs a new pipeline. If auto-post is on, each run adds a new comment to the ticket. Previously posted comments are excluded from the AI context to avoid circular reasoning.</p>

@@ -31,8 +31,12 @@ const KEYS = {
   productRequirements: 'product-requirements',
 };
 
-/** Persists the list of user needs to KVS. */
+/** Persists the list of user needs to KVS.
+ * Throws a human-readable error if the payload exceeds Forge KVS limits (~64KB per key).
+ */
 export async function saveUserNeeds(userNeeds) {
+  const bytes = JSON.stringify(userNeeds).length;
+  if (bytes > 60000) throw new Error(`User Needs is too large to save (${Math.round(bytes / 1024)}KB). Forge Storage has a 64KB per-key limit. Reduce the number or length of entries.`);
   await kvs.set(KEYS.userNeeds, userNeeds);
 }
 
@@ -41,8 +45,12 @@ export async function getUserNeeds() {
   return await kvs.get(KEYS.userNeeds) ?? [];
 }
 
-/** Persists the list of product requirements to KVS. */
+/** Persists the list of product requirements to KVS.
+ * Throws a human-readable error if the payload exceeds Forge KVS limits (~64KB per key).
+ */
 export async function saveProductRequirements(requirements) {
+  const bytes = JSON.stringify(requirements).length;
+  if (bytes > 60000) throw new Error(`Product Requirements is too large to save (${Math.round(bytes / 1024)}KB). Forge Storage has a 64KB per-key limit. Reduce the number or length of entries.`);
   await kvs.set(KEYS.productRequirements, requirements);
 }
 

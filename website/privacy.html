@@ -43,14 +43,27 @@
 
       <section>
         <h2 class="text-lg font-semibold text-slate-900 mb-3">What data is processed</h2>
-        <p>When you run a risk assessment on a Jira issue, the App reads and processes the following data from that issue:</p>
-        <ul class="list-disc pl-6 mt-3 space-y-1">
+        <p>When you run a risk assessment, the App sends two categories of data to Anthropic's API:</p>
+
+        <p class="mt-3 font-medium text-slate-700">1. Issue content (from Jira)</p>
+        <ul class="list-disc pl-6 mt-1 space-y-1">
           <li>Issue title (summary)</li>
           <li>Issue description</li>
           <li>Issue comments</li>
           <li>Reporter name</li>
         </ul>
-        <p class="mt-3">This data is entered into Jira by your organization and is processed solely for the purpose of generating a risk assessment.</p>
+
+        <p class="mt-3 font-medium text-slate-700">2. Your product configuration (from Settings)</p>
+        <ul class="list-disc pl-6 mt-1 space-y-1">
+          <li>Product name, type, and description</li>
+          <li>User Needs</li>
+          <li>Product Requirements</li>
+          <li>Probability scale labels and descriptions</li>
+          <li>Severity scale labels and descriptions</li>
+          <li>Risk matrix configuration</li>
+          <li>Additional context (if configured)</li>
+        </ul>
+        <p class="mt-3">Configuration data is included in every prompt as context so the AI can assess issues against your specific product. It does not contain personal data unless you choose to include it in your configuration fields.</p>
       </section>
 
       <section>
