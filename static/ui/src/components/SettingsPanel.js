@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { invoke } from '@forge/bridge';
 
+const PRIVACY_POLICY_URL = 'https://cahillconsultinggroup.com/privacy.html';
+
 const textareaStyle = {
   width: '100%',
   padding: '6px',
@@ -275,10 +277,121 @@ function ScaleEditor({ label, hint, scaleKey, saveResolver, initialScale, onDirt
   );
 }
 
+function DataHandlingModal({ onClose }) {
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        zIndex: 1000,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: '#fff', borderRadius: '6px', padding: '20px 24px',
+          maxWidth: '460px', width: '90%', boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+          fontSize: '13px', lineHeight: '1.6', color: '#172b4d',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+          <strong style={{ fontSize: '14px' }}>How is my data handled?</strong>
+          <button
+            onClick={onClose}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', color: '#6b778c', lineHeight: 1, padding: '0 2px' }}
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
+
+        <p style={{ margin: '0 0 4px', fontWeight: 600, fontSize: '12px', color: '#6b778c', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Stays on Atlassian Forge</p>
+        <p style={{ margin: '0 0 12px' }}>
+          All your configuration — product requirements, user needs, risk matrix, probability/severity scales, product info, and additional context — is stored in{' '}
+          <strong>Atlassian Forge's Key-Value Store</strong> and never leaves Atlassian's infrastructure. Your API key is stored as an encrypted secret within the same platform.
+        </p>
+
+        <p style={{ margin: '0 0 4px', fontWeight: 600, fontSize: '12px', color: '#6b778c', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Sent to Anthropic during a triage run</p>
+        <p style={{ margin: '0 0 12px' }}>
+          When you run a triage, the <strong>Jira issue content</strong> (title, description, comments) and your <strong>product context</strong> (requirements, user needs, product info, additional context) are assembled into a prompt and sent to{' '}
+          <strong>Anthropic's API</strong> to generate the risk assessment. This app does not store that data — it is processed and discarded once the result is returned.
+        </p>
+
+        <p style={{ margin: '0 0 16px', color: '#6b778c', fontSize: '12px' }}>
+          This app runs entirely on Atlassian's Forge serverless platform. There are no third-party servers involved — data goes Forge &rarr; Anthropic API &rarr; back to Forge, and that's it.
+        </p>
+
+        <a
+          href={PRIVACY_POLICY_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: '#0052cc', fontSize: '12px', textDecoration: 'none' }}
+        >
+          View our full Privacy Policy &rarr;
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function ApiKeyStorageModal({ onClose }) {
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        zIndex: 1000,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: '#fff', borderRadius: '6px', padding: '20px 24px',
+          maxWidth: '420px', width: '90%', boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+          fontSize: '13px', lineHeight: '1.6', color: '#172b4d',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+          <strong style={{ fontSize: '14px' }}>How is my API key stored?</strong>
+          <button
+            onClick={onClose}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', color: '#6b778c', lineHeight: 1, padding: '0 2px' }}
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
+        <p style={{ margin: '0 0 10px' }}>
+          Your API key is stored as an <strong>encrypted secret</strong> using{' '}
+          <strong>Atlassian Forge's built-in secret storage</strong> (<code style={{ fontSize: '11px', background: '#f4f5f7', padding: '1px 4px', borderRadius: '3px' }}>kvs.setSecret</code>).
+        </p>
+        <p style={{ margin: '0 0 10px' }}>
+          It lives entirely within Atlassian's infrastructure — no server run by this app ever stores or touches your key. It is only ever sent directly from Atlassian's servers to Anthropic's API when you run a triage, using an encrypted HTTPS connection.
+        </p>
+        <p style={{ margin: '0 0 16px', color: '#6b778c', fontSize: '12px' }}>
+          Atlassian Forge secrets are encrypted at rest and in transit, scoped to your Jira site, and are never accessible to other apps or users.
+        </p>
+        <a
+          href={PRIVACY_POLICY_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: '#0052cc', fontSize: '12px', textDecoration: 'none' }}
+        >
+          View our full Privacy Policy &rarr;
+        </a>
+      </div>
+    </div>
+  );
+}
+
 function SettingsPanel({ onBack }) {
   const [keyExists, setKeyExists] = useState(null);
   const [inputValue, setInputValue] = useState('');
   const [keyStatus, setKeyStatus] = useState('');
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+  const [showDataModal, setShowDataModal] = useState(false);
   const [postComment, setPostComment] = useState(true);
   const [dirtyMap, setDirtyMap] = useState({});
   const [confirmingBack, setConfirmingBack] = useState(false);
@@ -395,11 +508,19 @@ function SettingsPanel({ onBack }) {
 
   return (
     <div style={{ padding: '16px', fontFamily: 'sans-serif' }}>
+      {showApiKeyModal && <ApiKeyStorageModal onClose={() => setShowApiKeyModal(false)} />}
+      {showDataModal && <DataHandlingModal onClose={() => setShowDataModal(false)} />}
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
         <button onClick={handleBack} style={{ marginRight: '12px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px', color: '#0052cc' }}>
           &#8592; Back
         </button>
-        <h4 style={{ margin: 0 }}>Settings</h4>
+        <h4 style={{ margin: 0, flex: 1 }}>Settings</h4>
+        <button
+          onClick={() => setShowDataModal(true)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b778c', fontSize: '11px', textDecoration: 'underline', padding: 0 }}
+        >
+          How is my data handled?
+        </button>
       </div>
 
       {confirmingBack && (
@@ -449,6 +570,14 @@ function SettingsPanel({ onBack }) {
       />
       <button onClick={handleSaveKey}>Save API Key</button>
       {keyStatus && <p style={{ fontSize: '12px', marginTop: '6px' }}>{keyStatus}</p>}
+      <p style={{ margin: '6px 0 0', fontSize: '11px', color: '#6b778c' }}>
+        <button
+          onClick={() => setShowApiKeyModal(true)}
+          style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: '#0052cc', fontSize: '11px', textDecoration: 'underline' }}
+        >
+          How is my API key stored?
+        </button>
+      </p>
 
       <hr style={{ margin: '16px 0' }} />
 
