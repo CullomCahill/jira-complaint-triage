@@ -133,17 +133,54 @@
     </div>
   </section>
 
-  <!-- SCREENSHOTS PLACEHOLDER -->
+  <!-- SCREENSHOTS -->
   <section class="max-w-5xl mx-auto px-6 py-20">
-    <h2 class="text-3xl font-bold text-slate-900 text-center mb-4">See it in action</h2>
-    <p class="text-slate-500 text-center mb-12 text-sm">Screenshots coming soon — recording in progress.</p>
+    <h2 class="text-3xl font-bold text-slate-900 text-center mb-3">See it in action</h2>
+    <p class="text-slate-400 text-xs text-center mb-12">Click any screenshot to enlarge</p>
     <div class="grid sm:grid-cols-2 gap-6">
-      <div class="bg-slate-100 border border-slate-200 rounded-xl h-56 flex items-center justify-center text-slate-400 text-sm">HIGH risk assessment result</div>
-      <div class="bg-slate-100 border border-slate-200 rounded-xl h-56 flex items-center justify-center text-slate-400 text-sm">Settings panel — risk matrix config</div>
-      <div class="bg-slate-100 border border-slate-200 rounded-xl h-56 flex items-center justify-center text-slate-400 text-sm">NON-DEFECT result</div>
-      <div class="bg-slate-100 border border-slate-200 rounded-xl h-56 flex items-center justify-center text-slate-400 text-sm">Auto-posted comment on ticket</div>
+      <figure class="rounded-xl overflow-hidden border border-slate-200 shadow-sm cursor-zoom-in" onclick="openLightbox(this)">
+        <img src="assets/screenshot-high-risk-small.png" alt="HIGH risk assessment result" class="w-full h-auto" />
+        <figcaption class="text-xs text-slate-400 text-center py-2 bg-slate-50">HIGH risk result with evidence citations</figcaption>
+      </figure>
+      <figure class="rounded-xl overflow-hidden border border-slate-200 shadow-sm cursor-zoom-in" onclick="openLightbox(this)">
+        <img src="assets/screenshot-non-defect-small.png" alt="NON-DEFECT result" class="w-full h-auto" />
+        <figcaption class="text-xs text-slate-400 text-center py-2 bg-slate-50">NON-DEFECT — no further action needed</figcaption>
+      </figure>
+      <figure class="rounded-xl overflow-hidden border border-slate-200 shadow-sm cursor-zoom-in" onclick="openLightbox(this)">
+        <img src="assets/screenshot-settings-small.png" alt="Settings panel" class="w-full h-auto" />
+        <figcaption class="text-xs text-slate-400 text-center py-2 bg-slate-50">Settings — configure your product, requirements, and risk matrix</figcaption>
+      </figure>
+      <figure class="rounded-xl overflow-hidden border border-slate-200 shadow-sm cursor-zoom-in" onclick="openLightbox(this)">
+        <img src="assets/screenshot-comment-small.png" alt="Auto-posted comment on Jira ticket" class="w-full h-auto" />
+        <figcaption class="text-xs text-slate-400 text-center py-2 bg-slate-50">Auto-posted risk assessment comment on the ticket</figcaption>
+      </figure>
     </div>
   </section>
+
+  <!-- LIGHTBOX -->
+  <div id="lightbox" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center p-6" onclick="closeLightbox()">
+    <button class="absolute top-4 right-5 text-white text-3xl leading-none opacity-70 hover:opacity-100">&times;</button>
+    <img id="lightbox-img" src="" alt="" class="max-w-full max-h-full rounded-lg shadow-2xl" onclick="event.stopPropagation()" />
+    <p id="lightbox-caption" class="absolute bottom-5 left-0 right-0 text-center text-white text-sm opacity-70"></p>
+  </div>
+  <script>
+    function openLightbox(figure) {
+      const img = figure.querySelector('img');
+      const caption = figure.querySelector('figcaption');
+      document.getElementById('lightbox-img').src = img.src;
+      document.getElementById('lightbox-img').alt = img.alt;
+      document.getElementById('lightbox-caption').textContent = caption.textContent;
+      const lb = document.getElementById('lightbox');
+      lb.classList.remove('hidden');
+      lb.classList.add('flex');
+    }
+    function closeLightbox() {
+      const lb = document.getElementById('lightbox');
+      lb.classList.add('hidden');
+      lb.classList.remove('flex');
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+  </script>
 
   <!-- VIDEO -->
   <section class="bg-slate-900 py-20">
