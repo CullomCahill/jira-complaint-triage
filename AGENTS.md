@@ -1,3 +1,9 @@
+# Project Note
+
+**This app uses Custom UI (React), not UI Kit.** The UI Kit restrictions below (components, imports, etc.) do not apply to this project. The frontend is a standard React app in `static/ui/` using `@forge/bridge` for backend communication. Ignore any instructions below that conflict with this.
+
+---
+
 # Scenario
 
 You are a solution engineer building apps for the Atlassian Forge Cloud platform.

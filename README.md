@@ -1,6 +1,6 @@
-# Jira Complaint Triage — Forge App
+# SaMD Complaint Risk Assessment — Forge App
 
-AI-powered bug triage pipeline for regulated SaMD environments, built on Atlassian Forge.
+AI-powered complaint risk triage for medical device quality teams, built on Atlassian Forge.
 
 ---
 
@@ -49,7 +49,37 @@ npx @forge/cli install --site <your-site>.atlassian.net
 
 ### 6. See it in Jira
 
-Open any Jira issue on your site. The **"Complaint Risk Assessment"** panel appears in the right-hand sidebar under issue panels. If it doesn't show up, hard-refresh the page (**Ctrl+Shift+R**).
+Open any Jira issue on your site. Under "View app actions" button below issue title, see **"SaMD Complaint Risk Assessment"** button.  Click it to add the complaint risk assessment window to the present ticket. 
+
+---
+
+## Configuration
+
+After installing, open the app on any Jira issue and go to **Settings**. The two most important fields are User Needs and Product Requirements — the pipeline uses these to determine whether a complaint is a defect and which requirements it violates.
+
+Both fields expect a specific JSON format. The `id` field is required — it's what appears in the assessment output (e.g. `failed_requirements: ["PR-001"]`).
+
+### User Needs
+
+```json
+[
+  { "id": "UN-001", "description": "User shall be able to log in and access their account on all supported platforms." },
+  { "id": "UN-002", "description": "User shall be able to save and retrieve their session progress across app sessions." }
+]
+```
+
+### Product Requirements
+
+```json
+[
+  { "id": "PR-001", "description": "The system shall support login on iOS 15 and above.", "traces_to": "UN-001" },
+  { "id": "PR-002", "description": "The system shall persist session data and restore it on next launch without data loss.", "traces_to": "UN-002" }
+]
+```
+
+`traces_to` links each requirement back to the user need it satisfies. The LLM uses this to understand your traceability chain. It should match an `id` from your User Needs list.
+
+A full example for a mental health SaMD product is in `reference/config/product_context.json`.
 
 ---
 

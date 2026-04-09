@@ -49,30 +49,28 @@ function buildCommentAdf(report) {
   const rule = () => ({ type: 'rule' });
   const heading = (level, text) => ({ type: 'heading', attrs: { level }, content: [t(text)] });
 
-  const refsBlock = (refs) => {
-    if (!refs?.length) return [];
-    return [
-      rule(),
-      heading(4, 'Evidence'),
-      {
-        type: 'bulletList',
-        content: refs.map(r => ({
-          type: 'listItem',
-          content: [para(t(`${r.step} \u2014 ${r.source}: `, 'strong'), t(`\u201c${r.quote}\u201d`, 'em'))],
-        })),
-      },
-    ];
-  };
+  const bulletList = (items) => ({
+    type: 'bulletList',
+    content: items.map(item => ({ type: 'listItem', content: [item] })),
+  });
 
   if (report.classification === 'NON-DEFECT') {
+    const refs = report.references || [];
     return {
       version: 1, type: 'doc',
       content: [
-        { type: 'panel', attrs: { panelType: 'note' }, content: [para(t('NON-DEFECT', 'strong'))] },
         heading(3, `${report.bug_id} \u2014 Complaint Risk Assessment`),
+        para(t('AI-Generated Draft \u2014 For QE Review Only', 'em')),
+        rule(),
+        heading(4, 'Extracted Issue Summary'),
         para(t(report.defect_summary)),
+        heading(4, 'Suggested Disposition (for QE consideration)'),
         para(t(report.disposition, 'em')),
-        ...refsBlock(report.references),
+        ...(refs.length ? [
+          rule(),
+          heading(4, 'Evidence Extracted'),
+          bulletList(refs.map(r => para(t(`${r.source}: `, 'strong'), t(`\u201c${r.quote}\u201d`, 'em')))),
+        ] : []),
         rule(),
         para(t(`Generated: ${new Date(report.generated_at).toLocaleString()}`, 'em')),
       ],
@@ -81,27 +79,61 @@ function buildCommentAdf(report) {
 
   const ra = report.risk_assessment;
   const panelTypeMap = { HIGH: 'error', MEDIUM: 'warning', LOW: 'success' };
+  const allRefs = report.references || [];
+
+  const rationaleList = (points) => {
+    if (!points?.length) return [];
+    return [bulletList(points.map(pt => para(t(pt))))];
+  };
 
   return {
     version: 1, type: 'doc',
     content: [
-      {
-        type: 'panel',
-        attrs: { panelType: panelTypeMap[ra.risk_level] || 'info' },
-        content: [para(t(`${ra.risk_level} RISK`, 'strong'))],
-      },
+      // Header
       heading(3, `${report.bug_id} \u2014 Complaint Risk Assessment`),
+      para(t('AI-Generated Draft \u2014 For QE Review Only', 'em')),
+
+      // Preliminary risk call — up top, clearly labeled
+      {
+        type: 'panel', attrs: { panelType: panelTypeMap[ra.risk_level] || 'info' },
+        content: [para(t(`Preliminary Risk Suggestion: ${ra.risk_level}`, 'strong'))],
+      },
+
+      // ── LAYER 1: EXTRACTED FACTS ──────────────────────────────────────────
+      heading(4, 'Extracted Issue Summary'),
       para(t(report.defect_summary)),
+
+      heading(4, 'Potential Requirement / User Need Impact'),
+      bulletList([
+        para(t('Potential Failed Requirement: ', 'strong'), t(report.failed_requirements.join(', ') || 'None identified')),
+        para(t('Potential Failed User Need: ', 'strong'), t(report.failed_user_needs.join(', ') || 'None identified')),
+      ]),
+      para(t('QE confirmation required.', 'em')),
+
       rule(),
-      para(t('Disposition: ', 'strong'), t(report.disposition)),
-      para(t('Failed Requirements: ', 'strong'), t(report.failed_requirements.join(', ') || 'None')),
-      para(t('Failed User Needs: ', 'strong'), t(report.failed_user_needs.join(', ') || 'None')),
-      rule(),
-      para(t(`Probability: ${ra.probability_score} \u2014 ${ra.probability_label}`, 'strong')),
-      para(t(ra.probability_rationale)),
-      para(t(`Severity: ${ra.severity_score} \u2014 ${ra.severity_label}`, 'strong')),
-      para(t(ra.severity_rationale)),
-      ...refsBlock(report.references),
+
+      // ── LAYER 2: AI SUGGESTIONS ───────────────────────────────────────────
+      heading(4, `Preliminary Probability Suggestion: ${ra.probability_score} \u2014 ${ra.probability_label}`),
+      para(t('Rationale (AI-assisted):', 'strong')),
+      ...rationaleList(ra.probability_rationale_points),
+      para(t(`Confidence: ${ra.probability_confidence || 'Not assessed'}`)),
+
+      heading(4, `Preliminary Severity Suggestion: ${ra.severity_score} \u2014 ${ra.severity_label}`),
+      para(t('Rationale (AI-assisted):', 'strong')),
+      ...rationaleList(ra.severity_rationale_points),
+      para(t(`Confidence: ${ra.severity_confidence || 'Not assessed'}`)),
+
+      heading(4, `Preliminary Risk Level (per matrix): ${ra.risk_level}`),
+      para(t('Suggested Disposition (for QE consideration):', 'strong')),
+      para(t(report.disposition, 'em')),
+
+      // ── EVIDENCE ─────────────────────────────────────────────────────────
+      ...(allRefs.length ? [
+        rule(),
+        heading(4, 'Evidence Extracted'),
+        bulletList(allRefs.map(r => para(t(`${r.source}: `, 'strong'), t(`\u201c${r.quote}\u201d`, 'em')))),
+      ] : []),
+
       rule(),
       para(t(`Generated: ${new Date(report.generated_at).toLocaleString()}`, 'em')),
     ],

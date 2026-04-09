@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { invoke } from '@forge/bridge';
+
+const PRIVACY_POLICY_URL = 'https://cahillconsultinggroup.com/privacy.html';
 
 const textareaStyle = {
   width: '100%',
@@ -11,10 +13,12 @@ const textareaStyle = {
   marginBottom: '6px',
 };
 
-function ConfigSection({ label, hint, storageKey, saveResolver, onDirtyChange }) {
+function ConfigSection({ label, hint, storageKey, saveResolver, onDirtyChange, registerSave }) {
   const [text, setText] = useState('');
   const [saved, setSaved] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const [error, setError] = useState('');
+  const handleSaveRef = useRef(null);
 
   useEffect(() => {
     invoke('getProductContext').then((ctx) => {
@@ -26,9 +30,14 @@ function ConfigSection({ label, hint, storageKey, saveResolver, onDirtyChange })
     });
   }, [storageKey]);
 
+  useEffect(() => {
+    if (registerSave) registerSave(storageKey, () => handleSaveRef.current?.());
+  }, [storageKey, registerSave]);
+
   const handleChange = (e) => {
     setText(e.target.value);
     setSaved(false);
+    setDirty(true);
     onDirtyChange(storageKey, true);
   };
 
@@ -43,14 +52,18 @@ function ConfigSection({ label, hint, storageKey, saveResolver, onDirtyChange })
     }
     await invoke(saveResolver, { [storageKey]: parsed });
     setSaved(true);
+    setDirty(false);
     onDirtyChange(storageKey, false);
   };
+
+  handleSaveRef.current = handleSave;
 
   return (
     <div style={{ marginBottom: '20px' }}>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
         <strong style={{ fontSize: '13px' }}>{label}</strong>
         {saved && <span style={{ marginLeft: '8px', color: 'green', fontSize: '12px' }}>&#10003; saved</span>}
+        {dirty && !saved && <span style={{ marginLeft: '8px', color: '#ff991f', fontSize: '12px' }}>&#9679; unsaved</span>}
       </div>
       <p style={{ fontSize: '11px', color: '#666', margin: '0 0 4px' }}>{hint}</p>
       <textarea
@@ -96,7 +109,7 @@ const DEFAULT_RISK_MATRIX = {
   5: { 1: 'HIGH',   2: 'HIGH',   3: 'HIGH',   4: 'HIGH',   5: 'HIGH'   },
 };
 
-function RiskMatrixEditor({ matrix, probabilityScale, severityScale, onMatrixChange, onDirtyChange, onSave, saved }) {
+function RiskMatrixEditor({ matrix, probabilityScale, severityScale, onMatrixChange, onDirtyChange, onSave, saved, dirty }) {
   const cycleLevel = (sev, prob) => {
     const current = matrix?.[sev]?.[prob] ?? matrix?.[String(sev)]?.[String(prob)] ?? DEFAULT_RISK_MATRIX[sev][prob];
     const idx = RISK_LEVELS.indexOf(current);
@@ -122,6 +135,7 @@ function RiskMatrixEditor({ matrix, probabilityScale, severityScale, onMatrixCha
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
         <strong style={{ fontSize: '13px' }}>Risk Matrix</strong>
         {saved && <span style={{ marginLeft: '8px', color: 'green', fontSize: '12px' }}>&#10003; saved</span>}
+        {dirty && !saved && <span style={{ marginLeft: '8px', color: '#ff991f', fontSize: '12px' }}>&#9679; unsaved</span>}
       </div>
       <p style={{ fontSize: '11px', color: '#666', margin: '0 0 8px' }}>
         Click any cell to cycle its risk level. Rows = Severity (5 top, 1 bottom). Columns = Probability (1 left, 5 right).
@@ -190,29 +204,40 @@ function RiskMatrixEditor({ matrix, probabilityScale, severityScale, onMatrixCha
   );
 }
 
-function ScaleEditor({ label, hint, scaleKey, saveResolver, initialScale, onDirtyChange }) {
+function ScaleEditor({ label, hint, scaleKey, saveResolver, initialScale, onDirtyChange, registerSave }) {
   const [scale, setScale] = useState(initialScale);
   const [saved, setSaved] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  const handleSaveRef = useRef(null);
 
   useEffect(() => { setScale(initialScale); }, [initialScale]);
+
+  useEffect(() => {
+    if (registerSave) registerSave(scaleKey, () => handleSaveRef.current?.());
+  }, [scaleKey, registerSave]);
 
   const handleChange = (index, field, value) => {
     setScale(prev => prev.map((item, i) => i === index ? { ...item, [field]: value } : item));
     setSaved(false);
+    setDirty(true);
     onDirtyChange(scaleKey, true);
   };
 
   const handleSave = async () => {
     await invoke(saveResolver, { scale });
     setSaved(true);
+    setDirty(false);
     onDirtyChange(scaleKey, false);
   };
+
+  handleSaveRef.current = handleSave;
 
   return (
     <div style={{ marginBottom: '20px' }}>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
         <strong style={{ fontSize: '13px' }}>{label}</strong>
         {saved && <span style={{ marginLeft: '8px', color: 'green', fontSize: '12px' }}>&#10003; saved</span>}
+        {dirty && !saved && <span style={{ marginLeft: '8px', color: '#ff991f', fontSize: '12px' }}>&#9679; unsaved</span>}
       </div>
       <p style={{ fontSize: '11px', color: '#666', margin: '0 0 8px' }}>{hint}</p>
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
@@ -252,10 +277,121 @@ function ScaleEditor({ label, hint, scaleKey, saveResolver, initialScale, onDirt
   );
 }
 
+function DataHandlingModal({ onClose }) {
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        zIndex: 1000,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: '#fff', borderRadius: '6px', padding: '20px 24px',
+          maxWidth: '460px', width: '90%', boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+          fontSize: '13px', lineHeight: '1.6', color: '#172b4d',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+          <strong style={{ fontSize: '14px' }}>How is my data handled?</strong>
+          <button
+            onClick={onClose}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', color: '#6b778c', lineHeight: 1, padding: '0 2px' }}
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
+
+        <p style={{ margin: '0 0 4px', fontWeight: 600, fontSize: '12px', color: '#6b778c', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Stays on Atlassian Forge</p>
+        <p style={{ margin: '0 0 12px' }}>
+          All your configuration — product requirements, user needs, risk matrix, probability/severity scales, product info, and additional context — is stored in{' '}
+          <strong>Atlassian Forge's Key-Value Store</strong> and never leaves Atlassian's infrastructure. Your API key is stored as an encrypted secret within the same platform.
+        </p>
+
+        <p style={{ margin: '0 0 4px', fontWeight: 600, fontSize: '12px', color: '#6b778c', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Sent to Anthropic during a triage run</p>
+        <p style={{ margin: '0 0 12px' }}>
+          When you run a triage, the <strong>Jira issue content</strong> (title, description, comments) and your <strong>product context</strong> (requirements, user needs, product info, additional context) are assembled into a prompt and sent to{' '}
+          <strong>Anthropic's API</strong> to generate the risk assessment. This app does not store that data — it is processed and discarded once the result is returned.
+        </p>
+
+        <p style={{ margin: '0 0 16px', color: '#6b778c', fontSize: '12px' }}>
+          This app runs entirely on Atlassian's Forge serverless platform. There are no third-party servers involved — data goes Forge &rarr; Anthropic API &rarr; back to Forge, and that's it.
+        </p>
+
+        <a
+          href={PRIVACY_POLICY_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: '#0052cc', fontSize: '12px', textDecoration: 'none' }}
+        >
+          View our full Privacy Policy &rarr;
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function ApiKeyStorageModal({ onClose }) {
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        zIndex: 1000,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: '#fff', borderRadius: '6px', padding: '20px 24px',
+          maxWidth: '420px', width: '90%', boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+          fontSize: '13px', lineHeight: '1.6', color: '#172b4d',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+          <strong style={{ fontSize: '14px' }}>How is my API key stored?</strong>
+          <button
+            onClick={onClose}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', color: '#6b778c', lineHeight: 1, padding: '0 2px' }}
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
+        <p style={{ margin: '0 0 10px' }}>
+          Your API key is stored as an <strong>encrypted secret</strong> using{' '}
+          <strong>Atlassian Forge's built-in secret storage</strong> (<code style={{ fontSize: '11px', background: '#f4f5f7', padding: '1px 4px', borderRadius: '3px' }}>kvs.setSecret</code>).
+        </p>
+        <p style={{ margin: '0 0 10px' }}>
+          It lives entirely within Atlassian's infrastructure — no server run by this app ever stores or touches your key. It is only ever sent directly from Atlassian's servers to Anthropic's API when you run a triage, using an encrypted HTTPS connection.
+        </p>
+        <p style={{ margin: '0 0 16px', color: '#6b778c', fontSize: '12px' }}>
+          Atlassian Forge secrets are encrypted at rest and in transit, scoped to your Jira site, and are never accessible to other apps or users.
+        </p>
+        <a
+          href={PRIVACY_POLICY_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: '#0052cc', fontSize: '12px', textDecoration: 'none' }}
+        >
+          View our full Privacy Policy &rarr;
+        </a>
+      </div>
+    </div>
+  );
+}
+
 function SettingsPanel({ onBack }) {
   const [keyExists, setKeyExists] = useState(null);
   const [inputValue, setInputValue] = useState('');
   const [keyStatus, setKeyStatus] = useState('');
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+  const [showDataModal, setShowDataModal] = useState(false);
   const [postComment, setPostComment] = useState(true);
   const [dirtyMap, setDirtyMap] = useState({});
   const [confirmingBack, setConfirmingBack] = useState(false);
@@ -268,7 +404,22 @@ function SettingsPanel({ onBack }) {
   const [riskMatrix, setRiskMatrix] = useState(DEFAULT_RISK_MATRIX);
   const [riskMatrixSaved, setRiskMatrixSaved] = useState(false);
 
-  const isDirty = Object.values(dirtyMap).some(Boolean) || inputValue.trim().length > 0 || dirtyMap['productInfo'];
+  const FIELD_LABELS = {
+    userNeeds: 'User Needs',
+    productRequirements: 'Product Requirements',
+    riskMatrix: 'Risk Matrix',
+    productInfo: 'Product Info',
+    additionalContext: 'Additional Context',
+    probabilityScale: 'Probability Scale',
+    severityScale: 'Severity Scale',
+  };
+
+  const dirtyFields = [
+    ...Object.entries(dirtyMap).filter(([, v]) => v).map(([k]) => FIELD_LABELS[k] || k),
+    ...(inputValue.trim().length > 0 ? ['API Key'] : []),
+  ];
+
+  const isDirty = dirtyFields.length > 0;
 
   useEffect(() => {
     invoke('getApiKeyStatus').then(({ exists }) => setKeyExists(exists));
@@ -333,25 +484,52 @@ function SettingsPanel({ onBack }) {
     setKeyStatus('API key removed.');
   };
 
+  const saveHandlersRef = useRef({});
+  const registerSaveHandler = useCallback((key, fn) => {
+    saveHandlersRef.current[key] = fn;
+  }, []);
+
+  const handleSaveAll = async () => {
+    const tasks = [];
+    if (dirtyMap.productInfo) tasks.push(handleSaveProductInfo());
+    if (dirtyMap.additionalContext) tasks.push(handleSaveAdditionalContext());
+    if (dirtyMap.riskMatrix) tasks.push(handleSaveRiskMatrix());
+    if (inputValue.trim()) tasks.push(handleSaveKey());
+    for (const [key, fn] of Object.entries(saveHandlersRef.current)) {
+      if (dirtyMap[key]) tasks.push(fn());
+    }
+    await Promise.all(tasks);
+    onBack();
+  };
+
   const handleBack = () => {
     if (isDirty) { setConfirmingBack(true); } else { onBack(); }
   };
 
   return (
     <div style={{ padding: '16px', fontFamily: 'sans-serif' }}>
+      {showApiKeyModal && <ApiKeyStorageModal onClose={() => setShowApiKeyModal(false)} />}
+      {showDataModal && <DataHandlingModal onClose={() => setShowDataModal(false)} />}
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
         <button onClick={handleBack} style={{ marginRight: '12px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px', color: '#0052cc' }}>
           &#8592; Back
         </button>
-        <h4 style={{ margin: 0 }}>Settings</h4>
+        <h4 style={{ margin: 0, flex: 1 }}>Settings</h4>
+        <button
+          onClick={() => setShowDataModal(true)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b778c', fontSize: '11px', textDecoration: 'underline', padding: 0 }}
+        >
+          How is my data handled?
+        </button>
       </div>
 
       {confirmingBack && (
         <div style={{ marginBottom: '16px', padding: '10px 12px', background: '#fffae6', border: '1px solid #ffab00', borderRadius: '4px', fontSize: '12px' }}>
-          <strong>You have unsaved changes.</strong> Go back anyway?
+          <strong>Unsaved changes in: </strong>{dirtyFields.join(', ')}
           <div style={{ marginTop: '8px', display: 'flex', gap: '8px' }}>
             <button onClick={onBack}>Leave without saving</button>
-            <button onClick={() => setConfirmingBack(false)}>Stay</button>
+            <button onClick={() => setConfirmingBack(false)}>Keep editing</button>
+            <button onClick={handleSaveAll} style={{ fontWeight: 600 }}>Save all changes</button>
           </div>
         </div>
       )}
@@ -392,6 +570,14 @@ function SettingsPanel({ onBack }) {
       />
       <button onClick={handleSaveKey}>Save API Key</button>
       {keyStatus && <p style={{ fontSize: '12px', marginTop: '6px' }}>{keyStatus}</p>}
+      <p style={{ margin: '6px 0 0', fontSize: '11px', color: '#6b778c' }}>
+        <button
+          onClick={() => setShowApiKeyModal(true)}
+          style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', color: '#0052cc', fontSize: '11px', textDecoration: 'underline' }}
+        >
+          How is my API key stored?
+        </button>
+      </p>
 
       <hr style={{ margin: '16px 0' }} />
 
@@ -399,6 +585,7 @@ function SettingsPanel({ onBack }) {
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
           <strong style={{ fontSize: '13px' }}>Product Info</strong>
           {productInfoSaved && <span style={{ marginLeft: '8px', color: 'green', fontSize: '12px' }}>&#10003; saved</span>}
+          {dirtyMap.productInfo && !productInfoSaved && <span style={{ marginLeft: '8px', color: '#ff991f', fontSize: '12px' }}>&#9679; unsaved</span>}
         </div>
         <p style={{ fontSize: '11px', color: '#666', margin: '0 0 8px' }}>Used to personalise the risk assessment prompts to your product.</p>
         {[
@@ -426,6 +613,7 @@ function SettingsPanel({ onBack }) {
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
           <strong style={{ fontSize: '13px' }}>Additional Context</strong>
           {additionalContextSaved && <span style={{ marginLeft: '8px', color: 'green', fontSize: '12px' }}>&#10003; saved</span>}
+          {dirtyMap.additionalContext && !additionalContextSaved && <span style={{ marginLeft: '8px', color: '#ff991f', fontSize: '12px' }}>&#9679; unsaved</span>}
         </div>
         <p style={{ fontSize: '11px', color: '#666', margin: '0 0 6px' }}>
           Free-form context injected into every prompt. Use this for anything product-specific that isn't captured by the structured fields above — regulatory context, risk tolerance guidance, known edge cases, etc.
@@ -446,6 +634,7 @@ function SettingsPanel({ onBack }) {
         storageKey="userNeeds"
         saveResolver="saveUserNeeds"
         onDirtyChange={handleDirtyChange}
+        registerSave={registerSaveHandler}
       />
 
       <ConfigSection
@@ -454,6 +643,7 @@ function SettingsPanel({ onBack }) {
         storageKey="productRequirements"
         saveResolver="saveProductRequirements"
         onDirtyChange={handleDirtyChange}
+        registerSave={registerSaveHandler}
       />
 
       <hr style={{ margin: '0 0 16px' }} />
@@ -465,6 +655,7 @@ function SettingsPanel({ onBack }) {
         saveResolver="saveProbabilityScale"
         initialScale={probabilityScale}
         onDirtyChange={handleDirtyChange}
+        registerSave={registerSaveHandler}
       />
 
       <ScaleEditor
@@ -474,6 +665,7 @@ function SettingsPanel({ onBack }) {
         saveResolver="saveSeverityScale"
         initialScale={severityScale}
         onDirtyChange={handleDirtyChange}
+        registerSave={registerSaveHandler}
       />
 
       <hr style={{ margin: '0 0 16px' }} />
@@ -486,6 +678,7 @@ function SettingsPanel({ onBack }) {
         onDirtyChange={handleDirtyChange}
         onSave={handleSaveRiskMatrix}
         saved={riskMatrixSaved}
+        dirty={!!dirtyMap.riskMatrix}
       />
     </div>
   );

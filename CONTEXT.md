@@ -1,69 +1,79 @@
-# Claude Code Prompt: Jira Complaint Triage Forge App
+# Claude Code Prompt: SaMD Complaint Risk Assessment — Forge App
 
 ## Context
 
-I'm building a Jira Cloud app using Atlassian Forge that runs an AI powered bug triage pipeline for regulated Software as a Medical Device (SaMD) environments.  I already have a working Python pipeline that does this (see the /reference folder for the original Python code).  The Forge app scaffold is already set up and deployed using the jira-issue-panel Custom UI template.
+A Jira Cloud app built on Atlassian Forge that runs an AI-powered complaint risk assessment pipeline for regulated Software as a Medical Device (SaMD) environments. The app is fully built and deployed. Active work is focused on polish, testing, and Marketplace submission preparation.
 
-The original Python pipeline runs four sequential LLM calls per bug using the Anthropic API:
+The pipeline runs four steps per complaint ticket using the Anthropic API:
 
-1. Defect Classification:  determines if a bug is a formal defect by checking if it's in the released product AND violates a User Need or Product Requirement
-2. Probability Assessment:  scores likelihood a user encounters the defect (1 to 5 scale)
-3. Severity Assessment:  scores realistic impact if the defect occurs (1 to 5 scale)
-4. Risk Scoring:  combines probability x severity on a 5x5 matrix, no LLM call, just math
+1. **Defect Classification** — determines if a bug is a formal defect by checking whether it violates a User Need or Product Requirement
+2. **Probability Assessment** — scores likelihood a user encounters the defect (configurable 1–5 scale)
+3. **Severity Assessment** — scores realistic patient impact if the defect occurs (configurable 1–5 scale)
+4. **Risk Scoring** — looks up probability × severity on a configurable 5×5 matrix, no LLM call
 
-Each step outputs structured JSON that feeds into the next step.  The final output is a triage report suitable for a Complaint Review Board.
+Each step outputs structured JSON that feeds into the next. The final output is a triage report suitable for a Complaint Review Board.
 
-## What I'm Building
+## What's Built
 
-A Forge app with two main pieces:
+1. **Issue Panel** (`jira:issuePanel` module, Custom UI): appears on Jira issues via "View app actions" → "SaMD Complaint Risk Assessment". Has a "Run Risk Assessment" button that reads the issue data, runs the four-step pipeline, and displays the triage results (defect classification, probability, severity, risk level, recommended action, evidence citations). Optionally auto-posts the result as a formatted Jira comment.
 
-1. **Settings/Config Page** (Global Page or Admin Page module):  where users enter their Anthropic API key, product requirements, user needs, defect criteria (SOP defect criteria, risk matrix, severity/probability scales), and hazard definitions.  All stored using Forge Storage API.  API key stored using storage.setSecret().
-
-2. **Issue Panel** (jira:issuePanel module):  shows up on individual Jira issues.  Has a "Run Triage" button that pulls the issue data, runs it through the four step pipeline using the Anthropic API, and displays the triage results (defect classification, probability, severity, risk score, recommended action).
-
-## Technical Constraints
-
-- Forge runs on Node.js, so all Python logic needs to be ported to JavaScript/TypeScript
-- External API calls require declaring domains in manifest.yml under permissions.external.fetch.backend (need https://api.anthropic.com)
-- Use @forge/api for external fetch calls
-- Use @forge/api storage and storage.setSecret for persisting config and API keys
-- Use @forge/bridge for Custom UI communication with the backend resolver
-- The Custom UI frontend is a React app in the static/ directory
-- Keep the core triage logic as a clean standalone module with no Forge dependencies so it could be reused in other integrations later
+2. **Settings Panel** (embedded in the issue panel): where users configure their Anthropic API key, product info (name, type, description), user needs, product requirements, additional context, probability scale, severity scale, and risk matrix. All stored using Forge Storage API. API key stored using `storage.setSecret()`.
 
 ## Current State
 
-- Forge app scaffolded from jira-issue-panel Custom UI template
-- App deployed to development environment
-- App installed on my Jira dev site and showing on issues
-- No pipeline logic ported yet
-- No settings page yet
+- App fully built and deployed to development environment
+- Installed on a Jira dev site, accessible via "View app actions" on any issue
+- 52 Jest unit tests covering the full pipeline, running in CI via GitHub Actions
+- Preparing for Atlassian Marketplace submission
 
-## How I Want to Work
+## Pipeline Locations
 
-Let's work through the TASKS.md file in order.  Start with Task 1 and don't move to the next task until the current one is working.  Ask me questions if something is unclear rather than making assumptions.  When porting the Python pipeline steps, reference the original Python files in /reference to keep the prompts and logic faithful to the original.
+- **Active pipeline (JS):** `src/pipeline/` — the real pipeline used by the Forge app. All new work targets this.
+- **Reference pipeline (Python):** `reference/pipeline/` — the original Python implementation the JS was ported from. Read-only, do not modify.
 
-## File Structure Goal
+## Forge Runtime Constraint
+
+`src/pipeline/anthropicClient.js` uses `import { fetch } from '@forge/api'`, which only runs inside the Forge serverless runtime. Any standalone scripts (load tests, dev utilities) that invoke the pipeline outside of Forge must substitute native Node.js `fetch` or the Anthropic SDK — they cannot import `@forge/api` directly. The Jest test suite handles this via `__mocks__/@forge/api.js`.
+
+## Technical Constraints
+
+- Forge runs on Node.js — all pipeline logic is in JavaScript
+- External API calls require declaring domains in `manifest.yml` under `permissions.external.fetch.backend` (`https://api.anthropic.com` is declared)
+- Use `@forge/api` for external fetch calls from the backend
+- Use `@forge/api` storage and `storage.setSecret` for persisting config and API keys
+- Use `@forge/bridge` for Custom UI communication with the backend resolver
+- The Custom UI frontend is a React app in `static/ui/`
+- Pipeline logic in `src/pipeline/` has no Forge dependencies by design — pure functions that can be unit tested without a Forge runtime
+
+## File Structure
 
 ```
-jira-complaint-triage/
-  manifest.yml
+manifest.yml                  — App config, modules, permissions
+src/
+  index.js                    — Forge resolver functions (backend entry point)
+  storage.js                  — Forge KVS helpers for secrets and config
+  pipeline/                   — LLM triage steps (no Forge dependencies)
+    anthropicClient.js        — Shared Anthropic API call wrapper
+    defectClassification.js   — Step 1
+    probability.js            — Step 2
+    severity.js               — Step 3
+    riskScoring.js            — Step 4
+    riskMatrix.js             — 5×5 risk matrix lookup + default matrix
+    runPipeline.js            — Chains all four steps
+    __tests__/                — Jest unit tests for all pipeline functions
+static/ui/                    — Custom UI React app
   src/
-    index.js              (Forge resolver functions)
-    storage.js            (Forge Storage helpers for config and secrets)
-    pipeline/
-      defectClassification.js   (Step 1, ported from complaint_triage.py)
-      probability.js            (Step 2, ported from probability.py)
-      severity.js               (Step 3, ported from severity.py)
-      riskScoring.js            (Step 4, ported from final_scoring.py)
-      anthropicClient.js        (shared API call wrapper)
-  static/
-    hello-world/          (Custom UI React app, will rename later)
-      src/
-        App.js
-        components/
-          TriagePanel.js        (issue panel UI)
-          SettingsPage.js       (config/settings UI)
-        ...
-  reference/              (original Python files for reference during porting)
+    App.js
+    components/
+      SettingsPanel.js
+      TriageReport.js
+__mocks__/
+  @forge/api.js               — Jest mock for Forge platform SDK
+.github/workflows/
+  test.yml                    — GitHub Actions CI (runs npm test on push/PR)
+reference/                    — Original Python pipeline and example data (read-only)
+  pipeline/                   — Python source
+  config/                     — Example product context JSON
+  examples/                   — Example bug data and triage reports
+TEST_PLAN.md                  — Manual and automated test cases
 ```

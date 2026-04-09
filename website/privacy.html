@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — SaMD Complaint Risk Assessment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-white text-slate-800">
+
+  <!-- NAV -->
+  <nav class="border-b border-slate-200 bg-white">
+    <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="index.html" class="text-sm font-medium text-slate-600 hover:text-slate-900">← SaMD Complaint Risk Assessment</a>
+      <a href="https://marketplace.atlassian.com" target="_blank"
+         class="text-sm font-medium bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+        Get it free →
+      </a>
+    </div>
+  </nav>
+
+  <!-- CONTENT -->
+  <main class="max-w-3xl mx-auto px-6 py-16">
+
+    <h1 class="text-3xl font-bold text-slate-900 mb-2">Privacy Policy</h1>
+    <p class="text-slate-400 text-sm mb-10">Last updated: April 8, 2026 · SaMD Complaint Risk Assessment</p>
+
+    <div class="prose prose-slate max-w-none space-y-10 text-sm leading-relaxed text-slate-600">
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-900 mb-3">Overview</h2>
+        <p>
+          SaMD Complaint Risk Assessment ("the App") is a Jira Cloud app built on Atlassian Forge that performs AI-assisted complaint triage for medical device quality teams. This Privacy Policy explains what data the App processes, how it is used, and where it goes.
+        </p>
+        <p class="mt-3">
+          The App is provided by <strong>Cahill Consulting Group LLC</strong>. If you have questions about this policy, contact us at <a href="mailto:cullom@cahillconsultinggroup.com" class="text-blue-600 hover:underline">cullom@cahillconsultinggroup.com</a>.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-900 mb-3">What data is processed</h2>
+        <p>When you run a risk assessment, the App sends two categories of data to Anthropic's API:</p>
+
+        <p class="mt-3 font-medium text-slate-700">1. Issue content (from Jira)</p>
+        <ul class="list-disc pl-6 mt-1 space-y-1">
+          <li>Issue title (summary)</li>
+          <li>Issue description</li>
+          <li>Issue comments</li>
+          <li>Reporter name</li>
+        </ul>
+
+        <p class="mt-3 font-medium text-slate-700">2. Your product configuration (from Settings)</p>
+        <ul class="list-disc pl-6 mt-1 space-y-1">
+          <li>Product name, type, and description</li>
+          <li>User Needs</li>
+          <li>Product Requirements</li>
+          <li>Probability scale labels and descriptions</li>
+          <li>Severity scale labels and descriptions</li>
+          <li>Risk matrix configuration</li>
+          <li>Additional context (if configured)</li>
+        </ul>
+        <p class="mt-3">Configuration data is included in every prompt as context so the AI can assess issues against your specific product. It does not contain personal data unless you choose to include it in your configuration fields.</p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-900 mb-3">Why this data is processed</h2>
+        <p>
+          Issue content is sent to a third-party AI provider to perform defect classification and risk scoring — specifically, to determine whether the issue represents a product defect, assess the probability and severity of harm, and produce a final risk level aligned with ISO 14971.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-900 mb-3">Where issue data goes — Anthropic's API</h2>
+        <p>
+          Issue content is transmitted to <strong>Anthropic, PBC</strong> via their API at <code class="bg-slate-100 px-1 py-0.5 rounded text-xs">https://api.anthropic.com</code> for processing by Claude, Anthropic's AI model.
+        </p>
+        <p class="mt-3">
+          <strong>The App does not store issue content.</strong> After the API call completes and the assessment result is returned to your Jira session, no issue data is retained by the App.
+        </p>
+        <p class="mt-3">
+          Anthropic's own data retention and privacy policies apply to data processed through their API. For details, see <a href="https://www.anthropic.com/privacy" target="_blank" class="text-blue-600 hover:underline">anthropic.com/privacy</a>.
+        </p>
+        <p class="mt-3">
+          The App uses <strong>your organization's own Anthropic API key</strong>, which is entered in the App's Settings panel. Cahill Consulting Group LLC does not have access to your API key or to any issue content sent through it.
+        </p>
+      </section>
+
+      <section>
+        <h2 id="stored-data" class="text-lg font-semibold text-slate-900 mb-3">What IS stored — configuration data only</h2>
+        <p>The App stores only your configuration settings using <strong>Atlassian Forge Storage</strong>. This includes:</p>
+        <ul class="list-disc pl-6 mt-3 space-y-1">
+          <li>Your Anthropic API key</li>
+          <li>Product name, type, and description</li>
+          <li>User Needs and Product Requirements you define</li>
+          <li>Probability and severity scale definitions</li>
+          <li>Risk matrix configuration</li>
+        </ul>
+        <p class="mt-3">
+          This configuration data is stored within the Atlassian platform and is subject to <a href="https://www.atlassian.com/legal/privacy-policy" target="_blank" class="text-blue-600 hover:underline">Atlassian's Privacy Policy</a>. Cahill Consulting Group LLC does not access, export, or share this configuration data.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-900 mb-3">Jira permissions used</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm border-collapse mt-2">
+            <thead>
+              <tr class="border-b border-slate-200">
+                <th class="text-left py-2 pr-4 font-semibold text-slate-700">Permission</th>
+                <th class="text-left py-2 font-semibold text-slate-700">Why it is needed</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr>
+                <td class="py-2 pr-4 text-slate-500 font-mono text-xs">read:jira-work</td>
+                <td class="py-2 text-slate-500">Read the issue title, description, and comments submitted to the AI triage pipeline</td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-4 text-slate-500 font-mono text-xs">write:jira-work</td>
+                <td class="py-2 text-slate-500">Post the completed risk assessment as a formatted comment on the Jira issue (optional feature)</td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-4 text-slate-500 font-mono text-xs">storage:app</td>
+                <td class="py-2 text-slate-500">Persist your configuration (API key, product requirements, risk matrix) across sessions</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-900 mb-3">Data retention summary</h2>
+        <ul class="list-disc pl-6 space-y-1">
+          <li><strong>Issue content</strong> — not retained by this App after the API call completes</li>
+          <li><strong>Configuration data</strong> — stored in Atlassian Forge Storage until you uninstall the App or clear your settings</li>
+          <li><strong>Anthropic processing</strong> — subject to Anthropic's data retention policies; see <a href="https://www.anthropic.com/privacy" target="_blank" class="text-blue-600 hover:underline">anthropic.com/privacy</a></li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-900 mb-3">Your rights (GDPR)</h2>
+        <p>
+          If your organization is based in the European Union or United Kingdom, you may have rights under the General Data Protection Regulation (GDPR) or UK GDPR, including the right to access, correct, or request deletion of personal data. Since the App does not store personal data beyond what Atlassian's platform retains for configuration, most data requests should be directed to Atlassian or Anthropic directly.
+        </p>
+        <p class="mt-3">
+          For any privacy-related inquiries, contact us at <a href="mailto:cullom@cahillconsultinggroup.com" class="text-blue-600 hover:underline">cullom@cahillconsultinggroup.com</a>.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-900 mb-3">Changes to this policy</h2>
+        <p>
+          We may update this Privacy Policy as the App evolves. The "Last updated" date at the top of this page reflects the most recent revision. Continued use of the App after a policy update constitutes acceptance of the revised policy.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-900 mb-3">Contact</h2>
+        <p>
+          Cahill Consulting Group LLC<br />
+          <a href="mailto:cullom@cahillconsultinggroup.com" class="text-blue-600 hover:underline">cullom@cahillconsultinggroup.com</a><br />
+          <a href="https://www.linkedin.com/in/cullom-cahill-656032169/" target="_blank" class="text-blue-600 hover:underline">LinkedIn</a>
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-200 bg-white mt-10">
+    <div class="max-w-3xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <p class="text-slate-400 text-xs">SaMD Complaint Risk Assessment · Cahill Consulting Group LLC</p>
+      <div class="flex items-center gap-5 text-xs text-slate-400">
+        <a href="index.html" class="hover:text-slate-600">Home</a>
+        <a href="privacy.html" class="hover:text-slate-600">Privacy Policy</a>
+        <a href="terms.html" class="hover:text-slate-600">Terms of Service</a>
+        <a href="mailto:cullom@cahillconsultinggroup.com" class="hover:text-slate-600">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

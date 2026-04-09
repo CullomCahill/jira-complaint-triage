@@ -46,7 +46,8 @@ Respond in the following JSON format only, no other text:
     "bug_id": "${defect.bug_id}",
     "probability_score": 1 to 5,
     "probability_label": ${validLabels},
-    "rationale": "two to three sentence explanation grounded in specific evidence from the bug report",
+    "rationale_points": ["short inference statement 1", "short inference statement 2", "short inference statement 3 — use phrases like 'appears to', 'may represent', 'this suggests'. Two to three points maximum. Note if no frequency data is available."],
+    "confidence": "High, Medium, or Low",
     "references": [{ "source": "Comment by [author] [date]", "quote": "relevant excerpt that influenced this conclusion" }]
 }
 
