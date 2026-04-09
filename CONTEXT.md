@@ -25,6 +25,7 @@ Each step outputs structured JSON that feeds into the next. The final output is 
 - Installed on a Jira dev site, accessible via "View app actions" on any issue
 - 52 Jest unit tests covering the full pipeline, running in CI via GitHub Actions
 - Preparing for Atlassian Marketplace submission
+- Marketing website built in `website/` — landing page, Privacy Policy, Terms of Service, and user manual; to be hosted via GitHub Pages at complaintrisk.com
 
 ## Pipeline Locations
 
@@ -44,6 +45,8 @@ Each step outputs structured JSON that feeds into the next. The final output is 
 - Use `@forge/bridge` for Custom UI communication with the backend resolver
 - The Custom UI frontend is a React app in `static/ui/`
 - Pipeline logic in `src/pipeline/` has no Forge dependencies by design — pure functions that can be unit tested without a Forge runtime
+- Forge KVS has a ~64KB per-key limit — `saveUserNeeds` and `saveProductRequirements` in `storage.js` guard against this and throw a human-readable error if exceeded
+- Forge resolver functions have a 25s timeout — a known risk with large product requirement sets; see `notes.md` for the documented long-term fix (background function + polling)
 
 ## File Structure
 
@@ -76,4 +79,11 @@ reference/                    — Original Python pipeline and example data (rea
   config/                     — Example product context JSON
   examples/                   — Example bug data and triage reports
 TEST_PLAN.md                  — Manual and automated test cases
+notes.md                      — Dev notes, known limitations, future work
+docs/                      — Static marketing site (GitHub Pages → complaintrisk.com)
+  index.html                  — Landing page
+  privacy.html                — Privacy Policy
+  terms.html                  — Terms of Service
+  docs.html                   — User manual
+  assets/                     — Screenshots
 ```

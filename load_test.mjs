@@ -488,7 +488,7 @@ async function main() {
   // Load bugs — strip answer-key fields before sending to the LLM,
   // but keep them in a separate lookup for accuracy comparison after all runs.
   const rawData = JSON.parse(
-    readFileSync(join(__dirname, 'reference/examples/bug_data.json'), 'utf8')
+    readFileSync(join(__dirname, 'reference/examples/bug_data_training.json'), 'utf8')
   );
   const expectedLookup = {};
   const bugs = rawData.bugs.map(({ expected_classification, expected_probability, expected_severity, notes, ...bug }) => {
