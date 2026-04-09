@@ -1,4 +1,4 @@
-# SaMD Complaint Risk Assessment — Forge App
+# SaMD Risk Assessment — Forge App
 
 AI-powered complaint risk triage for medical device quality teams, built on Atlassian Forge.
 
@@ -49,7 +49,7 @@ npx @forge/cli install --site <your-site>.atlassian.net
 
 ### 6. See it in Jira
 
-Open any Jira issue on your site. Under "View app actions" button below issue title, see **"SaMD Complaint Risk Assessment"** button.  Click it to add the complaint risk assessment window to the present ticket. 
+Open any Jira issue on your site. Under "View app actions" button below issue title, see **"SaMD Risk Assessment"** button.  Click it to add the complaint risk assessment window to the present ticket. 
 
 ---
 

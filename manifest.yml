@@ -5,7 +5,7 @@ modules:
       resolver:
         function: resolver
       viewportSize: xlarge
-      title: SaMD Complaint Risk Assessment
+      title: SaMD Risk Assessment
       icon: https://developer.atlassian.com/platform/forge/images/issue-panel-icon.svg
   function:
     - key: resolver

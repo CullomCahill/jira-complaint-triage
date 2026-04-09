@@ -1,0 +1,147 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]: SaMD Complaint Risk Assessment
+      - generic [ref=e5]:
+        - link "Docs" [ref=e6] [cursor=pointer]:
+          - /url: /docs/
+        - link "Get it free →" [ref=e7] [cursor=pointer]:
+          - /url: https://marketplace.atlassian.com
+  - generic [ref=e9]:
+    - generic [ref=e10]: Free · Atlassian Marketplace · Jira Cloud
+    - heading "AI-powered complaint triage for medical device teams" [level=1] [ref=e11]:
+      - text: AI-powered complaint triage
+      - text: for medical device teams
+    - paragraph [ref=e12]: Stop manually scoring every complaint. SaMD Complaint Risk Assessment runs a structured ISO 14971-aligned risk assessment directly on your Jira ticket — defect classification, probability, severity, and a final risk score — in under a minute.
+    - link "Get it on Atlassian Marketplace →" [ref=e14] [cursor=pointer]:
+      - /url: https://marketplace.atlassian.com
+    - paragraph [ref=e15]: Free. Requires an Anthropic API key and Jira Cloud.
+  - generic [ref=e18]:
+    - generic [ref=e19]: Works with Jira Cloud
+    - generic [ref=e20]: ·
+    - generic [ref=e21]: Built on Atlassian Forge
+    - generic [ref=e22]: ·
+    - generic [ref=e23]: ISO 14971-aligned
+    - generic [ref=e24]: ·
+    - generic [ref=e25]: Powered by Claude
+  - paragraph [ref=e28]: Every complaint that comes in needs to be triaged. Is it a defect? What's the risk? Does it need a CAPA? For small quality teams, that process is manual, time-consuming, and inconsistent.
+  - generic [ref=e30]:
+    - heading "Four steps. One panel. No spreadsheets." [level=2] [ref=e32]
+    - generic [ref=e33]:
+      - generic [ref=e34]:
+        - generic [ref=e35]: "1"
+        - heading "Defect Classification" [level=3] [ref=e36]
+        - paragraph [ref=e37]: Determines whether the issue represents a deviation from a User Need or Product Requirement. NON-DEFECTs are flagged immediately.
+      - generic [ref=e38]:
+        - generic [ref=e39]: "2"
+        - heading "Probability Assessment" [level=3] [ref=e40]
+        - paragraph [ref=e41]: Scores the likelihood that users encounter this defect during normal use, using your configured 1–5 scale.
+      - generic [ref=e42]:
+        - generic [ref=e43]: "3"
+        - heading "Severity Assessment" [level=3] [ref=e44]
+        - paragraph [ref=e45]: Scores the potential harm if the defect occurs — grounded in patient safety and therapeutic impact, not just software severity.
+      - generic [ref=e46]:
+        - generic [ref=e47]: "4"
+        - heading "Risk Score" [level=3] [ref=e48]
+        - paragraph [ref=e49]: Combines probability and severity against your configured 5×5 risk matrix to produce a risk level and recommended disposition.
+        - generic [ref=e50]:
+          - generic [ref=e51]: LOW
+          - generic [ref=e52]: MEDIUM
+          - generic [ref=e53]: HIGH
+  - generic [ref=e54]:
+    - heading "See it in action" [level=2] [ref=e55]
+    - paragraph [ref=e56]: Click any screenshot to enlarge
+    - generic [ref=e57]:
+      - figure "HIGH risk result with evidence citations" [ref=e58]:
+        - img "HIGH risk assessment result" [ref=e59]
+        - generic [ref=e60]: HIGH risk result with evidence citations
+      - figure "NON-DEFECT — no further action needed" [ref=e61]:
+        - img "NON-DEFECT result" [ref=e62]
+        - generic [ref=e63]: NON-DEFECT — no further action needed
+      - figure "Settings — configure your product, requirements, and risk matrix" [ref=e64]:
+        - img "Settings panel" [ref=e65]
+        - generic [ref=e66]: Settings — configure your product, requirements, and risk matrix
+      - figure "Auto-posted risk assessment comment on the ticket" [ref=e67]:
+        - img "Auto-posted comment on Jira ticket" [ref=e68]
+        - generic [ref=e69]: Auto-posted risk assessment comment on the ticket
+  - generic [ref=e71]:
+    - heading "Watch a full walkthrough" [level=2] [ref=e72]
+    - paragraph [ref=e73]: See a real complaint triaged from start to finish — defect classification, risk scoring, and the auto-posted summary comment.
+    - generic [ref=e75]:
+      - img [ref=e76]
+      - paragraph [ref=e79]: Video walkthrough coming soon
+      - paragraph [ref=e80]: Replace this block with a Loom or YouTube embed
+  - generic [ref=e82]:
+    - heading "Built for regulated environments" [level=2] [ref=e84]
+    - generic [ref=e85]:
+      - generic [ref=e86]:
+        - generic [ref=e87]: Fully configurable
+        - paragraph [ref=e88]: Your product requirements, user needs, probability scale, severity scale, and risk matrix are all defined in the Settings panel. Nothing is hardcoded.
+      - generic [ref=e89]:
+        - generic [ref=e90]: Evidence citations
+        - paragraph [ref=e91]: Every conclusion comes with citations — the specific comments or fields that influenced the classification. Audit-ready by design.
+      - generic [ref=e92]:
+        - generic [ref=e93]: Stays in Jira
+        - paragraph [ref=e94]: No context switching. The panel runs directly on the issue. Results can be auto-posted as a formatted comment on the ticket.
+      - generic [ref=e95]:
+        - generic [ref=e96]: ISO 14971-aligned
+        - paragraph [ref=e97]: The four-step pipeline maps directly to the risk management process required for SaMD under ISO 14971.
+      - generic [ref=e98]:
+        - generic [ref=e99]: Your API key, your data
+        - paragraph [ref=e100]: You bring your own Anthropic API key. Issue content is sent to the Claude API for processing and is not stored by this app.
+      - generic [ref=e101]:
+        - generic [ref=e102]: Free, forever
+        - paragraph [ref=e103]: No license fees. Install from the Atlassian Marketplace and run assessments for the cost of a few Anthropic API tokens per ticket.
+  - generic [ref=e106]:
+    - heading "Made for small quality teams at medical device companies" [level=2] [ref=e107]
+    - list [ref=e108]:
+      - listitem [ref=e109]:
+        - generic [ref=e110]: ✓
+        - text: Managing Jira as your complaint handling system
+      - listitem [ref=e111]:
+        - generic [ref=e112]: ✓
+        - text: Doing risk assessments manually or in spreadsheets
+      - listitem [ref=e113]:
+        - generic [ref=e114]: ✓
+        - text: Spending QE time on triage that could be handled consistently by AI
+      - listitem [ref=e115]:
+        - generic [ref=e116]: ✓
+        - text: Working under ISO 14971, FDA 21 CFR Part 820, or MDR obligations
+    - paragraph [ref=e117]: It's not a replacement for a qualified engineer's judgment. It's the first pass — consistent, documented, and fast — so your team can focus on the decisions that actually need human review.
+  - generic [ref=e120]:
+    - generic [ref=e121]:
+      - heading "Need help beyond the tool?" [level=2] [ref=e122]
+      - paragraph [ref=e123]: Cahill Consulting Group LLC works with SaMD companies on quality management, risk frameworks, and regulatory strategy. If your team needs hands-on support — not just software — let's talk.
+    - paragraph [ref=e125]: cullom@cahillconsultinggroup.com
+  - generic [ref=e127]:
+    - heading "Start triaging in minutes" [level=2] [ref=e128]
+    - paragraph [ref=e129]: Install from the Atlassian Marketplace, enter your Anthropic API key in Settings, and run your first assessment.
+    - link "Get it free on Atlassian Marketplace →" [ref=e130] [cursor=pointer]:
+      - /url: https://marketplace.atlassian.com
+  - paragraph [ref=e133]:
+    - strong [ref=e134]: "Privacy note:"
+    - text: Issue content (title, description, comments) is sent to Anthropic's API for processing. This app does not store issue content after the API call completes. Your configuration data (product requirements, risk matrix, etc.) is stored in Atlassian Forge Storage. See our
+    - link "Privacy Policy" [ref=e135] [cursor=pointer]:
+      - /url: /privacy/
+    - text: and
+    - link "Terms of Service" [ref=e136] [cursor=pointer]:
+      - /url: /terms/
+    - text: .
+  - contentinfo [ref=e137]:
+    - generic [ref=e138]:
+      - generic [ref=e139]:
+        - paragraph [ref=e140]: SaMD Complaint Risk Assessment
+        - paragraph [ref=e141]:
+          - text: Built by
+          - link "Cullom Cahill" [ref=e142] [cursor=pointer]:
+            - /url: https://www.linkedin.com/in/cullom-cahill-656032169/
+          - text: · Cahill Consulting Group LLC
+      - generic [ref=e143]:
+        - link "Privacy Policy" [ref=e144] [cursor=pointer]:
+          - /url: /privacy/
+        - link "Terms of Service" [ref=e145] [cursor=pointer]:
+          - /url: /terms/
+        - link "LinkedIn" [ref=e146] [cursor=pointer]:
+          - /url: https://www.linkedin.com/in/cullom-cahill-656032169/
+        - link "Contact" [ref=e147] [cursor=pointer]:
+          - /url: mailto:cullom@cahillconsultinggroup.com
