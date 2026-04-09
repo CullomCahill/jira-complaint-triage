@@ -489,7 +489,10 @@ function SettingsPanel({ onBack }) {
     saveHandlersRef.current[key] = fn;
   }, []);
 
+  const [saveAllError, setSaveAllError] = useState('');
+
   const handleSaveAll = async () => {
+    setSaveAllError('');
     const tasks = [];
     if (dirtyMap.productInfo) tasks.push(handleSaveProductInfo());
     if (dirtyMap.additionalContext) tasks.push(handleSaveAdditionalContext());
@@ -498,8 +501,12 @@ function SettingsPanel({ onBack }) {
     for (const [key, fn] of Object.entries(saveHandlersRef.current)) {
       if (dirtyMap[key]) tasks.push(fn());
     }
-    await Promise.all(tasks);
-    onBack();
+    try {
+      await Promise.all(tasks);
+      onBack();
+    } catch {
+      setSaveAllError('Some changes could not be saved. Please try again.');
+    }
   };
 
   const handleBack = () => {
@@ -531,6 +538,7 @@ function SettingsPanel({ onBack }) {
             <button onClick={() => setConfirmingBack(false)}>Keep editing</button>
             <button onClick={handleSaveAll} style={{ fontWeight: 600 }}>Save all changes</button>
           </div>
+          {saveAllError && <p style={{ color: 'red', fontSize: '12px', margin: '6px 0 0' }}>{saveAllError}</p>}
         </div>
       )}
 
