@@ -80,7 +80,7 @@ reference/                    — Original Python pipeline and example data (rea
   examples/                   — Example bug data and triage reports
 TEST_PLAN.md                  — Manual and automated test cases
 notes.md                      — Dev notes, known limitations, future work
-website/                      — Static marketing site (GitHub Pages → complaintrisk.com)
+docs/                      — Static marketing site (GitHub Pages → complaintrisk.com)
   index.html                  — Landing page
   privacy.html                — Privacy Policy
   terms.html                  — Terms of Service

@@ -1,9 +1,9 @@
 import { getRiskLevel } from './riskMatrix.js';
 
 const DISPOSITION = {
-  LOW:    'Complaint — no immediate action indicated; address at team discretion if confirmed.',
-  MEDIUM: 'Evaluate for CAPA escalation if confirmed.',
-  HIGH:   'CAPA may be required if confirmed.',
+  LOW:    'Complaint - moderate timeline',
+  MEDIUM: 'Complaint - evaluate for CAPA escalation',
+  HIGH:   'CAPA Required',
 };
 
 /**
@@ -32,12 +32,14 @@ export function calculateRisk(defect, probability, severity, matrix) {
     risk_assessment: {
       probability_score:         probScore,
       probability_label:         probability.probability_label,
+      probability_rationale:        probability.rationale,
       probability_rationale_points: probability.rationale_points || [],
-      probability_confidence:    probability.confidence,
-      severity_score:            sevScore,
-      severity_label:            severity.severity_label,
-      severity_rationale_points: severity.rationale_points || [],
-      severity_confidence:       severity.confidence,
+      probability_confidence:       probability.confidence,
+      severity_score:               sevScore,
+      severity_label:               severity.severity_label,
+      severity_rationale:           severity.rationale,
+      severity_rationale_points:    severity.rationale_points || [],
+      severity_confidence:          severity.confidence,
       risk_level:                riskLevel,
     },
     disposition,
