@@ -1,4 +1,4 @@
-# Claude Code Prompt: SaMD Complaint Risk Assessment — Forge App
+# Claude Code Prompt: SaMD Risk Assessment — Forge App
 
 ## Context
 
@@ -15,7 +15,7 @@ Each step outputs structured JSON that feeds into the next. The final output is 
 
 ## What's Built
 
-1. **Issue Panel** (`jira:issuePanel` module, Custom UI): appears on Jira issues via "View app actions" → "SaMD Complaint Risk Assessment". Has a "Run Risk Assessment" button that reads the issue data, runs the four-step pipeline, and displays the triage results (defect classification, probability, severity, risk level, recommended action, evidence citations). Optionally auto-posts the result as a formatted Jira comment.
+1. **Issue Panel** (`jira:issuePanel` module, Custom UI): appears on Jira issues via "View app actions" → "SaMD Risk Assessment". Has a "Run Risk Assessment" button that reads the issue data, runs the four-step pipeline, and displays the triage results (defect classification, probability, severity, risk level, recommended action, evidence citations). Optionally auto-posts the result as a formatted Jira comment.
 
 2. **Settings Panel** (embedded in the issue panel): where users configure their Anthropic API key, product info (name, type, description), user needs, product requirements, additional context, probability scale, severity scale, and risk matrix. All stored using Forge Storage API. API key stored using `storage.setSecret()`.
 

@@ -1,4 +1,4 @@
-# TEST_PLAN.md — SaMD Complaint Risk Assessment
+# TEST_PLAN.md — SaMD Risk Assessment
 
 Tests are divided into **automated** (Jest unit tests against pipeline logic) and **manual** (requires a deployed Forge app on a live Jira instance).
 

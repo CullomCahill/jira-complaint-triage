@@ -33,7 +33,7 @@ function TriagePanel({ onSettings }) {
   return (
     <div style={{ padding: '16px', fontFamily: 'sans-serif' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <h4 style={{ margin: 0 }}>Complaint Risk Assessment</h4>
+        <h4 style={{ margin: 0 }}>Risk Assessment</h4>
         <button onClick={onSettings} style={{
           fontSize: '12px',
           padding: '4px 10px',
