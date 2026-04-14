@@ -63,6 +63,15 @@ Clean up the triage results display.  Show results in a clear, readable format w
     4. Loading states while pipeline runs — covered by the disabled
   button
 
+## CI/CD (Future)
+
+Set up GitHub Actions to enforce that production deploys only happen from main via CI, not locally.
+
+- Workflow triggers on push to `main`, runs `npx @forge/cli deploy -e production`
+- Requires `FORGE_EMAIL` and `FORGE_API_TOKEN` secrets in GitHub repo settings
+- Dev deploys (`-e development`) stay manual/local
+- Prevents accidental prod deploys from feature branches
+
 ## Stretch Goals (Later)
 
 - refine ui

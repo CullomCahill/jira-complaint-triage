@@ -65,13 +65,9 @@ export async function saveProductInfo(productInfo) {
   await kvs.set('product-info', productInfo);
 }
 
-/** Retrieves product metadata, defaulting to the MindBridge SaMD profile. */
+/** Retrieves product metadata. Returns empty strings if not yet configured. */
 export async function getProductInfo() {
-  return await kvs.get('product-info') ?? {
-    name: 'MindBridge',
-    type: 'regulated mental health Software as Medical Device (SaMD)',
-    description: 'a CBT-based therapeutic chatbot',
-  };
+  return await kvs.get('product-info') ?? { name: '', type: '', description: '' };
 }
 
 /** Persists the "post comment after triage" toggle setting. */
