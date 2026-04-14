@@ -144,6 +144,20 @@ manifest.yml        — App config, modules, permissions
 
 ---
 
+## Website (docs/)
+
+The marketing site lives in `docs/` and is deployed via GitHub Pages.
+
+To preview it locally:
+
+```bash
+npx serve docs
+```
+
+Then open `http://localhost:3000`.
+
+---
+
 ## Support
 
 See [Forge docs](https://developer.atlassian.com/platform/forge) or [Get help](https://developer.atlassian.com/platform/forge/get-help/).
