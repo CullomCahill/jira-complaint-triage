@@ -1,3 +1,9 @@
+# Developer Environment
+
+The developer is on **Windows (PowerShell)**. Always provide PowerShell-compatible commands. Do not use `&&` to chain commands — use `;` instead. Example: `npm run build --prefix static/ui; forge deploy --environment production`
+
+---
+
 # Project Note
 
 **This app uses Custom UI (React), not UI Kit.** The UI Kit restrictions below (components, imports, etc.) do not apply to this project. The frontend is a standard React app in `static/ui/` using `@forge/bridge` for backend communication. Ignore any instructions below that conflict with this.

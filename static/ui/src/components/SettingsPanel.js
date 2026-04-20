@@ -13,8 +13,8 @@ const textareaStyle = {
   marginBottom: '6px',
 };
 
-function ConfigSection({ label, hint, storageKey, saveResolver, onDirtyChange, registerSave }) {
-  const [text, setText] = useState('');
+function ConfigSection({ label, hint, placeholder, defaultValue, storageKey, saveResolver, onDirtyChange, registerSave }) {
+  const [text, setText] = useState(defaultValue ?? '');
   const [saved, setSaved] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [error, setError] = useState('');
@@ -69,6 +69,7 @@ function ConfigSection({ label, hint, storageKey, saveResolver, onDirtyChange, r
       <textarea
         style={textareaStyle}
         value={text}
+        placeholder={placeholder}
         onChange={handleChange}
         spellCheck={false}
       />
@@ -597,9 +598,9 @@ function SettingsPanel({ onBack }) {
         </div>
         <p style={{ fontSize: '11px', color: '#666', margin: '0 0 8px' }}>Used to personalise the risk assessment prompts to your product.</p>
         {[
-          { field: 'name', label: 'Product Name', placeholder: 'e.g. MindBridge' },
-          { field: 'type', label: 'Product Type', placeholder: 'e.g. regulated mental health Software as Medical Device (SaMD)' },
-          { field: 'description', label: 'Product Description', placeholder: 'e.g. a CBT-based therapeutic chatbot' },
+          { field: 'name', label: 'Product Name', placeholder: 'Name of your product' },
+          { field: 'type', label: 'Product Type', placeholder: 'e.g. regulated SaMD, Class II medical device, wellness app' },
+          { field: 'description', label: 'Product Description', placeholder: 'Brief description of what your product does' },
         ].map(({ field, label, placeholder }) => (
           <div key={field} style={{ marginBottom: '8px' }}>
             <label style={{ fontSize: '11px', color: '#6b778c', display: 'block', marginBottom: '2px' }}>{label}</label>
@@ -639,6 +640,7 @@ function SettingsPanel({ onBack }) {
       <ConfigSection
         label="User Needs"
         hint='JSON array of objects with "id" and "description" fields.'
+        defaultValue={`[\n  { "id": "UN-001", "description": "Replace with your first user need" },\n  { "id": "UN-002", "description": "Replace with your second user need" }\n]`}
         storageKey="userNeeds"
         saveResolver="saveUserNeeds"
         onDirtyChange={handleDirtyChange}
@@ -648,6 +650,7 @@ function SettingsPanel({ onBack }) {
       <ConfigSection
         label="Product Requirements"
         hint='JSON array of objects with "id", "description", and "traces_to" fields.'
+        defaultValue={`[\n  { "id": "PR-001", "description": "Replace with your first requirement", "traces_to": "UN-001" },\n  { "id": "PR-002", "description": "Replace with your second requirement", "traces_to": "UN-001" }\n]`}
         storageKey="productRequirements"
         saveResolver="saveProductRequirements"
         onDirtyChange={handleDirtyChange}
