@@ -640,7 +640,7 @@ function SettingsPanel({ onBack }) {
       <ConfigSection
         label="User Needs"
         hint='JSON array of objects with "id" and "description" fields.'
-        defaultValue={`[\n  { "id": "UN-001", "description": "Replace with your first user need" },\n  { "id": "UN-002", "description": "Replace with your second user need" }\n]`}
+        placeholder={`[\n  { "id": "UN-001", "description": "Replace with your first user need" },\n  { "id": "UN-002", "description": "Replace with your second user need" }\n]`}
         storageKey="userNeeds"
         saveResolver="saveUserNeeds"
         onDirtyChange={handleDirtyChange}
@@ -650,7 +650,7 @@ function SettingsPanel({ onBack }) {
       <ConfigSection
         label="Product Requirements"
         hint='JSON array of objects with "id", "description", and "traces_to" fields.'
-        defaultValue={`[\n  { "id": "PR-001", "description": "Replace with your first requirement", "traces_to": "UN-001" },\n  { "id": "PR-002", "description": "Replace with your second requirement", "traces_to": "UN-001" }\n]`}
+        placeholder={`[\n  { "id": "PR-001", "description": "Replace with your first requirement", "traces_to": "UN-001" },\n  { "id": "PR-002", "description": "Replace with your second requirement", "traces_to": "UN-001" }\n]`}
         storageKey="productRequirements"
         saveResolver="saveProductRequirements"
         onDirtyChange={handleDirtyChange}
