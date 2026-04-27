@@ -259,6 +259,9 @@ function TriageReport({ report, userNeeds = [], productRequirements = [] }) {
           scoreLabel={ra.probability_label}
           rationale={ra.probability_rationale}
         />
+        <p style={{ fontSize: '10px', color: '#97a0af', margin: '-4px 0 10px', paddingLeft: '138px', fontStyle: 'italic' }}>
+          For a more accurate estimate, add supporting data to the ticket — affected user count, logs, or reproduction rate.
+        </p>
         <ScoreRow
           label="Severity"
           score={ra.severity_score}

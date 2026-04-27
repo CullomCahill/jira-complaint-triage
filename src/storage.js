@@ -82,19 +82,19 @@ export async function getPostCommentSetting() {
 }
 
 const DEFAULT_PROBABILITY_SCALE = [
-  { label: 'Remote',    description: 'unlikely to occur' },
-  { label: 'Low',       description: 'could occur but rare' },
-  { label: 'Moderate',  description: 'may occur occasionally' },
-  { label: 'High',      description: 'likely to occur' },
-  { label: 'Very High', description: 'almost certain to occur' },
+  { label: 'Remote',    description: 'Theoretically possible but highly unlikely in practice. Would require an unusual or rare chain of events. No prior reports or known instances.' },
+  { label: 'Low',       description: 'Could occur but infrequently. Affects a small subset of users or requires an edge-case configuration. Sporadic reports possible.' },
+  { label: 'Moderate',  description: 'Occurs occasionally under known conditions. A recognizable usage pattern or scenario that a portion of users will encounter.' },
+  { label: 'High',      description: 'Likely to occur in normal use. Affects a broad user population or triggers under common, predictable conditions.' },
+  { label: 'Very High', description: 'Occurs frequently or consistently. Most or all users in the affected scenario will encounter this reliably.' },
 ];
 
 const DEFAULT_SEVERITY_SCALE = [
-  { label: 'Negligible', description: 'no impact on therapeutic experience' },
-  { label: 'Minor',      description: 'slight inconvenience, user can continue' },
-  { label: 'Moderate',   description: 'disrupts session but user can recover' },
-  { label: 'Major',      description: 'prevents therapeutic function or causes distress' },
-  { label: 'Critical',   description: 'potential for clinical harm or safety event' },
+  { label: 'Negligible',           description: 'No injury or inconvenience. User notices nothing or a trivial annoyance.' },
+  { label: 'Minor',                description: 'Temporary, reversible harm. No medical intervention needed. This is where most mental health app issues land — a mood tracker glitches, CBT content does not load, etc.' },
+  { label: 'Serious / Moderate',   description: 'Requires medical intervention, but not life-threatening. Reversible injury.' },
+  { label: 'Critical / Severe',    description: 'Permanent or serious irreversible harm. Think significant psychological deterioration, missed critical clinical intervention.' },
+  { label: 'Catastrophic',         description: 'Death or permanent severe disability.' },
 ];
 
 /** Persists a custom probability scale to KVS. */

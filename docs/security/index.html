@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="../assets/logo.png" />
+  <title>Security Policy — SaMD Risk Assessment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-white text-slate-800">
+
+  <!-- NAV -->
+  <nav class="border-b border-slate-200 bg-white">
+    <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="/" class="text-sm font-medium text-slate-600 hover:text-slate-900">← SaMD Risk Assessment</a>
+      <a href="https://calendly.com/cullom-cahill/30min" target="_blank"
+         class="text-sm font-medium bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+        Book a Demo →
+      </a>
+    </div>
+  </nav>
+
+  <!-- CONTENT -->
+  <main class="max-w-3xl mx-auto px-6 py-16">
+
+    <h1 class="text-3xl font-bold text-slate-900 mb-2">Security Policy</h1>
+    <p class="text-slate-400 text-sm mb-10">Last updated: April 24, 2026 · SaMD Risk Assessment</p>
+
+    <div class="prose prose-slate max-w-none space-y-10 text-sm leading-relaxed text-slate-600">
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-900 mb-3">Overview</h2>
+        <p>
+          Cahill Consulting Group LLC takes security seriously. This page describes the technical controls in place for the SaMD Risk Assessment Jira app and how to report security concerns.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-900 mb-3">Data in transit</h2>
+        <p>
+          All data transmitted between the app and Anthropic's API is encrypted in transit via HTTPS. No issue content is transmitted over unencrypted channels.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-900 mb-3">API key storage</h2>
+        <p>
+          Your Anthropic API key is stored using Atlassian Forge's built-in secret storage. It is never logged, never exposed in plain text, and Cahill Consulting Group LLC does not have access to it.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-900 mb-3">Infrastructure security</h2>
+        <p>
+          The app runs entirely on Atlassian Forge, Atlassian's serverless cloud platform. All platform-level security controls — including network isolation, access controls, and infrastructure hardening — are managed by Atlassian.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-900 mb-3">Vulnerability response</h2>
+        <p>
+          We follow Atlassian's Marketplace Security Bug Fix Policy for remediation timelines.
+        </p>
+        <ul class="list-disc pl-6 mt-3 space-y-1">
+          <li><strong>Critical</strong> vulnerabilities are addressed within 10 days.</li>
+          <li><strong>High severity</strong> vulnerabilities are addressed within 4 weeks.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-900 mb-3">Reporting a security issue</h2>
+        <p>
+          To report a security vulnerability or concern, email <a href="mailto:support@complaintrisk.com" class="text-blue-600 hover:underline">support@complaintrisk.com</a>. We will acknowledge your report within 48 hours and keep you informed of our progress.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-900 mb-3">Contact</h2>
+        <p>
+          <a href="mailto:support@complaintrisk.com" class="text-blue-600 hover:underline">support@complaintrisk.com</a>
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-200 bg-white mt-10">
+    <div class="max-w-3xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <p class="text-slate-400 text-xs">SaMD Risk Assessment · Cahill Consulting Group LLC</p>
+      <div class="flex items-center gap-5 text-xs text-slate-400">
+        <a href="/" class="hover:text-slate-600">Home</a>
+        <a href="/privacy/" class="hover:text-slate-600">Privacy Policy</a>
+        <a href="/dpa/" class="hover:text-slate-600">DPA</a>
+        <a href="/terms/" class="hover:text-slate-600">Terms of Service</a>
+        <a href="/contact/" class="hover:text-slate-600">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
