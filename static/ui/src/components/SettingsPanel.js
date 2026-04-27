@@ -81,19 +81,19 @@ function ConfigSection({ label, hint, placeholder, defaultValue, storageKey, sav
 
 
 const DEFAULT_PROBABILITY_SCALE = [
-  { label: 'Remote',    description: 'unlikely to occur' },
-  { label: 'Low',       description: 'could occur but rare' },
-  { label: 'Moderate',  description: 'may occur occasionally' },
-  { label: 'High',      description: 'likely to occur' },
-  { label: 'Very High', description: 'almost certain to occur' },
+  { label: 'Remote',    description: 'Theoretically possible but highly unlikely in practice. Would require an unusual or rare chain of events. No prior reports or known instances.' },
+  { label: 'Low',       description: 'Could occur but infrequently. Affects a small subset of users or requires an edge-case configuration. Sporadic reports possible.' },
+  { label: 'Moderate',  description: 'Occurs occasionally under known conditions. A recognizable usage pattern or scenario that a portion of users will encounter.' },
+  { label: 'High',      description: 'Likely to occur in normal use. Affects a broad user population or triggers under common, predictable conditions.' },
+  { label: 'Very High', description: 'Occurs frequently or consistently. Most or all users in the affected scenario will encounter this reliably.' },
 ];
 
 const DEFAULT_SEVERITY_SCALE = [
-  { label: 'Negligible', description: 'no impact on therapeutic experience' },
-  { label: 'Minor',      description: 'slight inconvenience, user can continue' },
-  { label: 'Moderate',   description: 'disrupts session but user can recover' },
-  { label: 'Major',      description: 'prevents therapeutic function or causes distress' },
-  { label: 'Critical',   description: 'potential for clinical harm or safety event' },
+  { label: 'Negligible',           description: 'No injury or inconvenience. User notices nothing or a trivial annoyance.' },
+  { label: 'Minor',                description: 'Temporary, reversible harm. No medical intervention needed. This is where most mental health app issues land — a mood tracker glitches, CBT content does not load, etc.' },
+  { label: 'Serious / Moderate',   description: 'Requires medical intervention, but not life-threatening. Reversible injury.' },
+  { label: 'Critical / Severe',    description: 'Permanent or serious irreversible harm. Think significant psychological deterioration, missed critical clinical intervention.' },
+  { label: 'Catastrophic',         description: 'Death or permanent severe disability.' },
 ];
 
 const RISK_LEVELS = ['LOW', 'MEDIUM', 'HIGH'];
@@ -640,7 +640,7 @@ function SettingsPanel({ onBack }) {
       <ConfigSection
         label="User Needs"
         hint='JSON array of objects with "id" and "description" fields.'
-        defaultValue={`[\n  { "id": "UN-001", "description": "Replace with your first user need" },\n  { "id": "UN-002", "description": "Replace with your second user need" }\n]`}
+        placeholder={`[\n  { "id": "UN-001", "description": "Replace with your first user need" },\n  { "id": "UN-002", "description": "Replace with your second user need" }\n]`}
         storageKey="userNeeds"
         saveResolver="saveUserNeeds"
         onDirtyChange={handleDirtyChange}
@@ -650,7 +650,7 @@ function SettingsPanel({ onBack }) {
       <ConfigSection
         label="Product Requirements"
         hint='JSON array of objects with "id", "description", and "traces_to" fields.'
-        defaultValue={`[\n  { "id": "PR-001", "description": "Replace with your first requirement", "traces_to": "UN-001" },\n  { "id": "PR-002", "description": "Replace with your second requirement", "traces_to": "UN-001" }\n]`}
+        placeholder={`[\n  { "id": "PR-001", "description": "Replace with your first requirement", "traces_to": "UN-001" },\n  { "id": "PR-002", "description": "Replace with your second requirement", "traces_to": "UN-001" }\n]`}
         storageKey="productRequirements"
         saveResolver="saveProductRequirements"
         onDirtyChange={handleDirtyChange}
@@ -668,6 +668,9 @@ function SettingsPanel({ onBack }) {
         onDirtyChange={handleDirtyChange}
         registerSave={registerSaveHandler}
       />
+      <p style={{ fontSize: '11px', color: '#6b778c', margin: '-12px 0 16px', fontStyle: 'italic' }}>
+        Probability is only as accurate as the information in the ticket. For better results, include supporting detail in the ticket comments — affected user counts, relevant logs, reproduction rate, or any data that helps quantify how often this occurs.
+      </p>
 
       <ScaleEditor
         label="Severity Scale"

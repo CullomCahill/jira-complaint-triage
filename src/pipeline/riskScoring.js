@@ -16,6 +16,14 @@ const DISPOSITION = {
  * @param {object} matrix      - 5×5 risk matrix from storage
  * @returns {object} Final triage report for a single issue
  */
+const toRationaleText = (rationale, points) => {
+  if (typeof rationale === 'string' && rationale.trim().length > 0) return rationale;
+  if (Array.isArray(points)) return points.join(' ');
+  return '';
+};
+
+const safePoints = (points) => (Array.isArray(points) ? points : []);
+
 export function calculateRisk(defect, probability, severity, matrix) {
   const probScore = probability.probability_score;
   const sevScore  = severity.severity_score;
@@ -32,13 +40,13 @@ export function calculateRisk(defect, probability, severity, matrix) {
     risk_assessment: {
       probability_score:         probScore,
       probability_label:         probability.probability_label,
-      probability_rationale:        probability.rationale || (probability.rationale_points || []).join(' '),
-      probability_rationale_points: probability.rationale_points || [],
+      probability_rationale:        toRationaleText(probability.rationale, probability.rationale_points),
+      probability_rationale_points: safePoints(probability.rationale_points),
       probability_confidence:       probability.confidence,
       severity_score:               sevScore,
       severity_label:               severity.severity_label,
-      severity_rationale:           severity.rationale || (severity.rationale_points || []).join(' '),
-      severity_rationale_points:    severity.rationale_points || [],
+      severity_rationale:           toRationaleText(severity.rationale, severity.rationale_points),
+      severity_rationale_points:    safePoints(severity.rationale_points),
       severity_confidence:          severity.confidence,
       risk_level:                riskLevel,
     },
