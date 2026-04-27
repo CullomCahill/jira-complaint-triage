@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="../assets/logo.png" />
-  <title>Privacy Policy — SaMD Risk Assessment</title>
+  <title>Privacy & Security Policy — SaMD Risk Assessment</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -27,7 +27,7 @@
   <!-- CONTENT -->
   <main class="max-w-3xl mx-auto px-6 py-16">
 
-    <h1 class="text-3xl font-bold text-slate-900 mb-2">Privacy Policy</h1>
+    <h1 class="text-3xl font-bold text-slate-900 mb-2">Privacy & Security Policy</h1>
     <p class="text-slate-400 text-sm mb-10">Last updated: April 20, 2026 · SaMD Risk Assessment</p>
 
     <div class="prose prose-slate max-w-none space-y-10 text-sm leading-relaxed text-slate-600">
@@ -35,7 +35,7 @@
       <section>
         <h2 class="text-lg font-semibold text-slate-900 mb-3">Overview</h2>
         <p>
-          SaMD Risk Assessment ("the App") is a Jira Cloud app built on Atlassian Forge that performs AI-assisted complaint triage for medical device quality teams. This Privacy Policy explains what data the App processes, how it is used, and where it goes.
+          SaMD Risk Assessment ("the App") is a Jira Cloud app built on Atlassian Forge that performs AI-assisted complaint triage for medical device quality teams. This Privacy & Security Policy explains what data the App processes, how it is used, where it goes, and the security controls in place to protect it.
         </p>
         <p class="mt-3">
           The App is provided by <strong>Cahill Consulting Group LLC</strong>. If you have questions about this policy, contact us via our <a href="/contact/" class="text-blue-600 hover:underline">contact form</a>.
@@ -134,6 +134,17 @@
       </section>
 
       <section>
+        <h2 class="text-lg font-semibold text-slate-900 mb-3">Security</h2>
+        <ul class="list-disc pl-6 space-y-2">
+          <li><strong>Data in transit</strong> — all data transmitted to Anthropic's API is encrypted via HTTPS. No issue content is transmitted over unencrypted channels.</li>
+          <li><strong>API key storage</strong> — your Anthropic API key is stored using Atlassian Forge's built-in secret storage. It is never logged, never exposed in plain text, and Cahill Consulting Group LLC does not have access to it.</li>
+          <li><strong>Infrastructure</strong> — the app runs entirely on Atlassian Forge, Atlassian's serverless cloud platform. All platform-level security controls — including network isolation, access controls, and infrastructure hardening — are managed by Atlassian.</li>
+          <li><strong>Vulnerability response</strong> — we follow Atlassian's Marketplace Security Bug Fix Policy for remediation timelines. Critical vulnerabilities are addressed within 10 days; high severity within 4 weeks.</li>
+          <li><strong>Reporting a security issue</strong> — to report a vulnerability or concern, email <a href="mailto:support@complaintrisk.com" class="text-blue-600 hover:underline">support@complaintrisk.com</a>. We will acknowledge your report within 48 hours and keep you informed of our progress.</li>
+        </ul>
+      </section>
+
+      <section>
         <h2 class="text-lg font-semibold text-slate-900 mb-3">Data retention summary</h2>
         <ul class="list-disc pl-6 space-y-1">
           <li><strong>Issue content</strong> — not retained by this App after the API call completes</li>
@@ -155,7 +166,7 @@
       <section>
         <h2 class="text-lg font-semibold text-slate-900 mb-3">Changes to this policy</h2>
         <p>
-          We may update this Privacy Policy as the App evolves. The "Last updated" date at the top of this page reflects the most recent revision. Continued use of the App after a policy update constitutes acceptance of the revised policy.
+          We may update this Privacy & Security Policy as the App evolves. The "Last updated" date at the top of this page reflects the most recent revision. Continued use of the App after a policy update constitutes acceptance of the revised policy.
         </p>
       </section>
 
@@ -177,10 +188,9 @@
       <p class="text-slate-400 text-xs">SaMD Risk Assessment · Cahill Consulting Group LLC</p>
       <div class="flex items-center gap-5 text-xs text-slate-400">
         <a href="/" class="hover:text-slate-600">Home</a>
-        <a href="/privacy/" class="hover:text-slate-600">Privacy Policy</a>
+        <a href="/privacy/" class="hover:text-slate-600">Privacy & Security</a>
         <a href="/dpa/" class="hover:text-slate-600">DPA</a>
         <a href="/terms/" class="hover:text-slate-600">Terms of Service</a>
-        <a href="/security/" class="hover:text-slate-600">Security</a>
         <a href="/contact/" class="hover:text-slate-600">Contact</a>
       </div>
     </div>
